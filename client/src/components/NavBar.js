@@ -2,8 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 const NavBar = () => {
-    return (
-      <div className="container">
+    return (<nav>
+      <div className="nav">
         <Link to="/"><h1>Dashboard</h1></Link>
         <div className="nav-container">
           <ul className="nav-inner">
@@ -16,6 +16,8 @@ const NavBar = () => {
           </ul>
         </div>
         </div>
+    </nav>
+
     )
 }
 
