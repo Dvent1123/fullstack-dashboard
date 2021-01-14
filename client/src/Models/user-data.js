@@ -5,17 +5,20 @@ export const userData = [
     //techs can only see the dashboard and edit and create issues
     {
         id: 1,
-        name: 'Daniel',
+        username: 'Daniel',
+        password: '1234',
         role: 'admin',
     },
     {
         id: 2,
-        name: 'Justin',
-        role: 'manager',
+        username: 'Justin',
+        password: '2345',
+        role: 'user',
     },
     {
         id: 3,
-        name: 'Eddy',
-        role: 'tech',
+        username: 'Eddy',
+        password: '3456',
+        role: 'user',
     }
 ]
