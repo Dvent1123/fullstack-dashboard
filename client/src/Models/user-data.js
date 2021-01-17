@@ -13,12 +13,14 @@ export const userData = [
         id: 2,
         username: 'Justin',
         password: '2345',
+        job: 'tech',
         role: 'user',
     },
     {
         id: 3,
         username: 'Eddy',
         password: '3456',
+        job: 'engineer',
         role: 'user',
     }
 ]

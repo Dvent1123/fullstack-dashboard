@@ -97,6 +97,15 @@ nav {
   margin: 0 auto;
 }
 
+.section-title {
+  display: flex;
+  flex-direction: row;
+}
+
+.section-title h1 {
+  width: 80%;
+}
+
 /* HomeContainer Componenent */
 .second-home-container {
   width: 100%;
@@ -114,4 +123,64 @@ nav {
 
 .second-container-center h3 {
   padding: 0rem 1rem;
+}
+
+/* Form */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-wrapper {
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+}
+
+.modal {
+  z-index: 100;
+  background: white;
+  align-items: center;
+  justify-content: center;
+  margin: 1.75rem auto;
+  border-radius: 1rem;
+  max-width: 75vw;
+  max-height: 40vw;
+  padding: 10rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-close-button {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  opacity: 0.3;
+  cursor: pointer;
+  border: none;
+}
+
+.button-default {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
 }

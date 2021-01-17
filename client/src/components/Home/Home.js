@@ -1,13 +1,7 @@
-import React, {useState, useEffect} from 'react'
-import HomeContainer from '../Helpers/HomeContainer'
-import { assetData } from '../../Models/asset-data'
-import { taskData } from '../../Models/task-data'
-import HomeTasks from './HomeTasks'
-import HomeAssets from './HomeAssets'
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Home = () => {
-    const [assets, setAssets] = useState([])
-    const [tasks, setTasks] = useState([])
 
     //FOLLOW THIS EXAMPLE WHEN FETCHING FROM THE API
 //   const [users, setUsers] = useState([]);
@@ -23,27 +17,36 @@ const Home = () => {
 
 
 
-    useEffect(() => {
-        setAssets(assetData)
-    },[])
-    useEffect(() => {
-        setTasks(taskData)
-    },[])
+
+
 
     //the problemof why this isn't working is because it renders and then updates the tasks but it only updates it once
     //in the use effect it only does this once so by the time it renders it's already over and done
     return (
         <div className="home-container">
-            <div>
-                <h1>You are in the home page</h1>
+            <div className="nav-container">
+            <ul className="nav-inner">
+                <li className="nav-item">
+                <Link to="/assets" className="nav-link">Assets</Link>
+                </li>
+                <li className="nav-item">
+                <Link to="/tasks" className="nav-link">Tasks</Link>
+                </li>
+                <li className="nav-item">
+                <Link to="/users" className="nav-link">Users</Link>
+                </li>
+            </ul>
             </div>
-            {
+            {/* {
                 <HomeTasks tasks={tasks}/>
 
             }
             {
                 <HomeAssets assets={assets} />
             }
+            {
+                <HomeUsers users={users} />
+            } */}
         </div>
 
 
