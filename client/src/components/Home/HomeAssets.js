@@ -4,6 +4,7 @@ import { assetData } from '../../Models/asset-data'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
+import axios from 'axios'
 
 const HomeAssets = () => {
     const [assets, setAssets] = useState([])
@@ -13,18 +14,44 @@ const HomeAssets = () => {
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
 
+  const getAssets = async () => {
+    try{
+        const newAssets = await axios.get('http://localhost:5000/assets')
 
-    useEffect(() => {
-        setAssets(assetData)
-    },[])
+        if(!isEmpty(newAssets)){
+            setAssets(newAssets);
+        }
+    }catch(error){
+        console.log(error)
+    }
+  };
+
+  useEffect(() => {
+    getAssets();
+  }, []);
+
+  function isEmpty(obj){
+      return Object.keys(obj).length === 0
+  }
+
 
     const onSubmit = (e) => {
         e.preventDefault()
+
+        const newAsset = {
+            name: name,
+            status: status,
+            location: location,
+            desc: description
+        }
+
+        axios.post('http://localhost:5000/assets/new', newAsset)
+            .then(res => console.log(res.data))
+
         setName('')
         setStatus(0)
         setLocation('')
         setDescription('')
-        console.log(name, status, location, description)
     }
 
 
@@ -44,7 +71,7 @@ const HomeAssets = () => {
                         <h2>Immediate Action</h2>
                     </div>
                         {
-                            assets.filter(asset => asset.status === 1).map(filteredAsset => {
+                            Object.values(assets).filter(asset => asset.status === 1).map(filteredAsset => {
                                 return (
                                     <div key={filteredAsset.id}>
                                         <HomeContainerAssets asset={filteredAsset}/>
@@ -58,13 +85,14 @@ const HomeAssets = () => {
                         <h2>Needs Service</h2>
                     </div>
                     {
-                            assets.filter(asset => asset.status === 2).map(filteredAsset => {
+                       
+                            assets.length ? Object.values(assets).filter(asset => asset.status === 2).map(filteredAsset => {
                                 return (
                                     <div key={filteredAsset.id}>
                                         <HomeContainerAssets asset={filteredAsset}/>
                                     </div>
                                 )
-                            })
+                            }) : <div> There are no assets </div>
                         }
                 </section>
                 <section className="section-container">
@@ -73,7 +101,7 @@ const HomeAssets = () => {
                     </div>
                         <div>
                             {
-                            assets.map((asset) => {
+                            Object.values(assets).map((asset) => {
                                 return (
                                     <div key={asset.id}>
                                         <HomeContainerAssets asset={asset}/>

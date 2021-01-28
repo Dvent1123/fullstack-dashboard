@@ -4,6 +4,7 @@ import {AiFillPlusCircle} from 'react-icons/ai'
 import { userData } from '../../Models/user-data'
 import ModalUsers from '../Helpers/Modal/ModalUsers'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
+import axios from 'axios'
 
 const HomeUsers = () => {
     const {isShown, toggle} = ModalContainer()
@@ -15,7 +16,15 @@ const HomeUsers = () => {
 
     const onSubmit = (e) => {
         e.preventDefault()
-        console.log(userName, password, role, job)
+        const newUser = {
+            username: userName,
+            password: password,
+            role: role,
+            job: job
+        }
+
+        axios.post('http://localhost:5000/users/new', newUser)
+            .then(res => console.log(res.data))
         setUserName('')
         setPassword('')
         setJob('')

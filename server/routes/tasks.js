@@ -13,7 +13,7 @@ router.get('/', async (req, res)=> {
 //front end can send the asset id
 router.post('/new', async (req, res) => {
     const newTask =  req.body
-    console.log(newTask.name)
+    console.log(newTask.assignedTo)
     res.send({"message": "New Task Added", "task": newTask})
 })
 

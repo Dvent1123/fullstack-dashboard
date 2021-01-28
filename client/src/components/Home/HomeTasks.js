@@ -4,6 +4,7 @@ import HomeContainerTasks from '../Helpers/HomeContainerTasks'
 import { taskData } from '../../Models/task-data'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import ModalTasks from '../Helpers/Modal/ModalTasks'
+import axios from 'axios'
 
 const HomeTasks = () => {
     const [tasks, setTasks] = useState([])
@@ -14,7 +15,18 @@ const HomeTasks = () => {
 
     const onSubmit = (e) => {
         e.preventDefault()
-         console.log(assignedTo, assetName, desc)
+
+    const newTask = {
+        //createdBy
+        //asset obj that it is referencing
+        //status
+            assignedTo: assignedTo,
+            desc: desc
+        }
+
+        axios.post('http://localhost:5000/tasks/new', newTask)
+            .then(res => console.log(res.data))
+
         setAssignedTo('None')
         setAssetName('None')
         setDesc('')

@@ -9,7 +9,7 @@ router.get('/', async (req, res)=> {
 //add a new user
 router.post('/new', async (req, res) => {
     const newUser =  req.body
-    console.log(newUser.name)
+    console.log(newUser.username)
     res.send({"message": "New Person Added", "person": newUser})
 })
 

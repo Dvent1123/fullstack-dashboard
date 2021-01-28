@@ -1,12 +1,17 @@
 const { json } = require('body-parser')
 const express = require('express')
 const router = express.Router()
-
+const Assets = require('../models/Assets')
 
 router.get('/', async (req, res)=> {
-    //go into database here to get assets
-    //as well as tasks
-    res.send({"message": "You are in the assets page"})
+    let assetsArray = []
+    try{
+        assetsArray = await Assets.find({})
+        console.log(assetsArray)
+        res.send({assetsArray})
+    }catch{
+        res.status(500).json({message: 'There was an error retrieving the data from the db'})
+    }
 })
 
 //add a new asset
