@@ -7,10 +7,14 @@ router.get('/', async (req, res)=> {
     let assetsArray = []
     try{
         assetsArray = await Assets.find({})
-        console.log(assetsArray)
-        res.send({assetsArray})
+        return res.status(201).send({
+            error: false,
+            assetsArray
+        })
     }catch{
-        res.status(500).json({message: 'There was an error retrieving the data from the db'})
+        res.status(500).send({
+            error: true,
+        })
     }
 })
 

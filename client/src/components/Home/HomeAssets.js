@@ -1,10 +1,10 @@
 import React, {useState, useEffect}  from 'react'
 import HomeContainerAssets from '../Helpers/HomeContainerAssets'
-import { assetData } from '../../Models/asset-data'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import axios from 'axios'
+import getAll from '../../services/assetsService'
 
 const HomeAssets = () => {
     const [assets, setAssets] = useState([])
@@ -14,27 +14,21 @@ const HomeAssets = () => {
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
 
+    //gets the assets using the services
   const getAssets = async () => {
-    try{
-        const newAssets = await axios.get('http://localhost:5000/assets')
-
-        if(!isEmpty(newAssets)){
-            setAssets(newAssets);
-        }
-    }catch(error){
-        console.log(error)
-    }
+        let res = await getAll()
+        console.log(res)
+        setAssets(res)
   };
 
   useEffect(() => {
-    getAssets();
-  }, []);
-
-  function isEmpty(obj){
-      return Object.keys(obj).length === 0
-  }
+      if(!assets){
+        getAssets();
+      }
+  }, [assets]);
 
 
+//Handles form submit for new asset
     const onSubmit = (e) => {
         e.preventDefault()
 
@@ -54,6 +48,14 @@ const HomeAssets = () => {
         setDescription('')
     }
 
+    //renders the assets
+    const renderAssets = (filteredAsset) => {
+        return (
+            <div key={filteredAsset.id}>
+                <HomeContainerAssets asset={filteredAsset}/>
+            </div>
+        )
+    }
 
     return (
             <section className="home-containers">
@@ -69,49 +71,48 @@ const HomeAssets = () => {
                 <section className="section-container">
                     <div className="section-title">
                         <h2>Immediate Action</h2>
-                    </div>
-                        {
-                            Object.values(assets).filter(asset => asset.status === 1).map(filteredAsset => {
-                                return (
-                                    <div key={filteredAsset.id}>
-                                        <HomeContainerAssets asset={filteredAsset}/>
-                                    </div>
-                                )
-                            })
-                        }
+                    </div>                              
+                                <div className="assets">
+                                    {(assets && assets.length > 0) ? (
+                                        assets.filter(asset => asset.status === 1).map(filteredAsset => {
+                                         return renderAssets(filteredAsset)
+                                        })
+                                    ) : (
+                                        //come back and change this to something else
+                                        <p>No products found</p>
+                                    )}
+                                </div>
+                    </section>
+                    <section className="section-container">
+                    <div className="section-title">
+                        <h2>Needs Service</h2>
+                    </div>                              
+                                <div className="assets">
+                                    {(assets && assets.length > 0) ? (
+                                        assets.filter(asset => asset.status === 2).map(filteredAsset => {
+                                         return renderAssets(filteredAsset)
+                                        })
+                                    ) : (
+                                        //come back and change this to something else
+                                        <p>No products found</p>
+                                    )}
+                                </div>
                     </section>
                 <section className="section-container">
                     <div className="section-title">
-                        <h2>Needs Service</h2>
-                    </div>
-                    {
-                       
-                            assets.length ? Object.values(assets).filter(asset => asset.status === 2).map(filteredAsset => {
-                                return (
-                                    <div key={filteredAsset.id}>
-                                        <HomeContainerAssets asset={filteredAsset}/>
-                                    </div>
-                                )
-                            }) : <div> There are no assets </div>
-                        }
-                </section>
-                <section className="section-container">
-                    <div className="section-title">
                         <h2>All Assets</h2>
-                    </div>
-                        <div>
-                            {
-                            Object.values(assets).map((asset) => {
-                                return (
-                                    <div key={asset.id}>
-                                        <HomeContainerAssets asset={asset}/>
-                                     </div>
-                                    )
-   
-                                })
-                            }
-                        </div>
-                </section>
+                    </div>                              
+                                <div className="assets">
+                                    {(assets && assets.length > 0) ? (
+                                        assets.filter(asset => asset.status === 1).map(filteredAsset => {
+                                         return renderAssets(filteredAsset)
+                                        })
+                                    ) : (
+                                        //come back and change this to something else
+                                        <p>No products found</p>
+                                    )}
+                                </div>
+                    </section>
             </section>
     )
 }
