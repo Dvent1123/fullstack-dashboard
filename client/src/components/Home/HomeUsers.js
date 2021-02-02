@@ -4,15 +4,27 @@ import {AiFillPlusCircle} from 'react-icons/ai'
 import { userData } from '../../Models/user-data'
 import ModalUsers from '../Helpers/Modal/ModalUsers'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
+import { getAllUsers, createUser } from '../../services/usersServices'
 import axios from 'axios'
 
 const HomeUsers = () => {
     const {isShown, toggle} = ModalContainer()
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState(null)
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [job, setJob] = useState('')
     const [role, setRole] = useState('User')
+
+    const getUsers = async () =>{
+        let res = await getAllUsers()
+        console.log(res.usersArray)
+        setUsers(res.usersArray)
+    }
+
+    const newUserFunction = async (userObj) => {
+        let res = await createUser(userObj)
+        console.log(res)
+    }
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -23,8 +35,8 @@ const HomeUsers = () => {
             job: job
         }
 
-        axios.post('http://localhost:5000/users/new', newUser)
-            .then(res => console.log(res.data))
+        newUserFunction(newUser)
+
         setUserName('')
         setPassword('')
         setJob('')
@@ -33,8 +45,19 @@ const HomeUsers = () => {
 
 
     useEffect(()=> {
-        setUsers(userData)
-    },[])
+        if(!users){
+            getUsers();
+        }
+    })
+
+    //renders the users
+    const renderUsers = (user) => {
+        return (
+            <div key={user._id}>
+                <HomeContainerUsers user={user}/>
+                </div>
+        )
+    }
 
     return (
             <section className="home-containers">
@@ -48,15 +71,17 @@ const HomeUsers = () => {
                 role={role} setRole={setRole}
                 job={job} setJob={setJob}/>
                 <section className="section-container">
-                        {
-                            users.map(user => {
-                                return (
-                                    <div key={user.id}>
-                                        <HomeContainerUsers user={user}/>
-                                    </div>
+                        <div className="users">
+                            {
+                                (users && users.length > 0) ? (
+                                    users.map(user => {
+                                        return renderUsers(user)
+                                    })
+                                ) :(
+                                        <p>No Users found</p>
                                 )
-                            })
-                        }
+                            }
+                        </div>
                     </section>
             </section>
     )

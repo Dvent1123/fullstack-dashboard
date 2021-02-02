@@ -3,11 +3,10 @@ import HomeContainerAssets from '../Helpers/HomeContainerAssets'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
-import axios from 'axios'
-import getAll from '../../services/assetsService'
+import {getAll, createAsset} from '../../services/assetsService'
 
 const HomeAssets = () => {
-    const [assets, setAssets] = useState([])
+    const [assets, setAssets] = useState(null)
     const {isShown, toggle} = ModalContainer()
     const [name, setName] = useState('')
     const [status, setStatus] = useState(0)
@@ -17,15 +16,20 @@ const HomeAssets = () => {
     //gets the assets using the services
   const getAssets = async () => {
         let res = await getAll()
-        console.log(res)
-        setAssets(res)
+        console.log(res.assetsArray)
+        setAssets(res.assetsArray)
   };
+
+  const newAssetFunction = async (assetObj) => {
+        let res = await createAsset(assetObj)
+        console.log(res)
+    }
 
   useEffect(() => {
       if(!assets){
         getAssets();
       }
-  }, [assets]);
+  });
 
 
 //Handles form submit for new asset
@@ -39,8 +43,10 @@ const HomeAssets = () => {
             desc: description
         }
 
-        axios.post('http://localhost:5000/assets/new', newAsset)
-            .then(res => console.log(res.data))
+        //if this doesn't come back with an error then 
+        //gucci gang, if it does than we'll have to
+        //make an error thing to say there was an error
+        newAssetFunction(newAsset)
 
         setName('')
         setStatus(0)
@@ -51,7 +57,7 @@ const HomeAssets = () => {
     //renders the assets
     const renderAssets = (filteredAsset) => {
         return (
-            <div key={filteredAsset.id}>
+            <div key={filteredAsset._id}>
                 <HomeContainerAssets asset={filteredAsset}/>
             </div>
         )
@@ -79,7 +85,7 @@ const HomeAssets = () => {
                                         })
                                     ) : (
                                         //come back and change this to something else
-                                        <p>No products found</p>
+                                        <p>No Assets found</p>
                                     )}
                                 </div>
                     </section>
@@ -94,7 +100,7 @@ const HomeAssets = () => {
                                         })
                                     ) : (
                                         //come back and change this to something else
-                                        <p>No products found</p>
+                                        <p>No Assets found</p>
                                     )}
                                 </div>
                     </section>
@@ -109,7 +115,7 @@ const HomeAssets = () => {
                                         })
                                     ) : (
                                         //come back and change this to something else
-                                        <p>No products found</p>
+                                        <p>No Assets found</p>
                                     )}
                                 </div>
                     </section>

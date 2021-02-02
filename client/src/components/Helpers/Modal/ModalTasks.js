@@ -3,7 +3,9 @@ import ReactDom from 'react-dom'
 
 const ModalTasks = ({isShowing, hide, onSubmit, 
     assignedTo, setAssignedTo, 
-     assetName, setAssetName,desc, setDesc}) => isShowing ? ReactDom.createPortal(
+    desc, setDesc, assets,
+    setAssignedAsset,
+    status, setStatus}) => isShowing ? ReactDom.createPortal(
     <> 
         <div className="modal-overlay">
             <div className="modal-wrapper" tabIndex={-1} aria-modal aria-hidden  role="dialog">
@@ -16,6 +18,14 @@ const ModalTasks = ({isShowing, hide, onSubmit,
                     <form onSubmit={onSubmit}>
                         {/* This can stay for now but gonna have to get values from database */}
                         <div className="form-group">
+                            <label htmlFor="assignedTo">Task Created By: Daniel</label>
+                            {/* <select id="assignedTo" value={assignedTo} onChange={(e)=> setAssignedTo(e.target.value)}>
+                                <option value="None">None</option>
+                                <option value="Eddy">Eddy</option>
+                                <option value="Justin">Justin</option>
+                            </select>     */}
+                        </div>       
+                        <div className="form-group">
                             <label htmlFor="assignedTo">Task Assigned To: </label>
                             <select id="assignedTo" value={assignedTo} onChange={(e)=> setAssignedTo(e.target.value)}>
                                 <option value="None">None</option>
@@ -25,15 +35,29 @@ const ModalTasks = ({isShowing, hide, onSubmit,
                         </div>
                         <div className="form-group">
                             <label htmlFor="assetId">Task to be completed on which Asset: </label>
-                            <select id="assetName" value={assetName} onChange={(e)=> setAssetName(e.target.value)}>
+                            <select id="assetName" onChange={(e)=> setAssignedAsset(e.target.value)}>
                                 <option value="None">None</option>
-                                <option value="computer">Computer</option>
-                                <option value="server">Server</option>
+                                {
+                                    assets.map((asset) => {
+                                        return (
+                                            <option key={asset._id} value={asset._id}>{asset.name}</option>
+                                        )
+                                    })
+                                }
                             </select>    
                         </div>           
                         <div className="form-group">
                             <label htmlFor="desc">Description of Task</label>
                             <textarea className="form-input" value={desc} onChange={(e) => setDesc(e.target.value)} rows="5"></textarea>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="status">Status of Asset: </label>
+                            <select id="status" value={status} onChange={(e)=> setStatus(e.target.value)}>
+                                <option value="0">Select a Status</option>
+                                <option value="1">Not Complete</option>
+                                <option value="2">In Progress</option>
+                                <option value="3">Pending Approval</option>
+                            </select>    
                         </div>
                         <div className="form-group">
                             <button className="form-button" type="submit">

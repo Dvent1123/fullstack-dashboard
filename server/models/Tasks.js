@@ -11,9 +11,8 @@ const taskSchema = new mongoose.Schema({
         required: true
     },
     asset: {
-        type: Asset,
-        default: {},
-        required: false
+        type: String,
+        required: true
     },
     status: {
         type: Number, 

@@ -20,9 +20,26 @@ router.get('/', async (req, res)=> {
 
 //add a new asset
 router.post('/new', async (req, res) => {
-    const newAsset =  req.body
-    console.log(newAsset.name)
-    res.send({"message": "New Person Added", "person": newAsset})
+    let newAsset =  req.body
+    try{
+        const asset = new Assets({
+            name: newAsset.name,
+            status: newAsset.status,
+            location: newAsset.location,
+            desc: newAsset.desc
+        })
+
+        const saveAsset = await asset.save()
+        return res.status(201).send({
+            error: false,
+            saveAsset
+        })
+
+    }catch{
+        res.status(500).send({
+            error: true,
+        })
+    }
 })
 
 //this route will update the existing assets
