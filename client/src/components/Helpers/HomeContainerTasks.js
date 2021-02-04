@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {IoCheckmarkCircleSharp} from 'react-icons/io5'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import ModalTasks from '../Helpers/Modal/ModalTasks'
+import {deleteTask} from '../../services/tasksService'
 
 const HomeContainerTasks = ({task, assets}) => {
     const {assignedTo, desc,asset,status,createdBy, _id} = task
@@ -12,6 +13,12 @@ const HomeContainerTasks = ({task, assets}) => {
     const [taskStatus, setTaskStatus] = useState(status)
     const [taskDesc, setTaskDesc] = useState(desc)
     const [taskAsset, setTaskAsset] = useState(asset)
+    const [id, setId] = useState(_id)
+
+    const removeTask = async() => {
+        let res = await deleteTask(id)
+        console.log(res.task)
+    }
 
     //where you update the tasks
     const onSubmit = (e) => {
@@ -28,6 +35,7 @@ const HomeContainerTasks = ({task, assets}) => {
                 <h3>Task: {desc} </h3>
                 <h3>Asset #: {asset}</h3>
                 <button className="default-button" onClick={toggle}>Edit</button>
+                <button onClick={removeTask}>Delete</button>
                 <IoCheckmarkCircleSharp size={'50px'}/>
             </div>
                 <ModalTasks isShowing={isShown} hide={toggle} onSubmit={onSubmit} 

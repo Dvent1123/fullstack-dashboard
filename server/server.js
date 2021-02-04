@@ -16,6 +16,8 @@ const tasksRouter = require('./routes/tasks')
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: false}))
+
 
 
 const mongoose = require('mongoose')

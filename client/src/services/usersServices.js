@@ -9,3 +9,8 @@ export const createUser = async (newUser) => {
      let res = await axios.post('http://localhost:5000/users/new', newUser)
             return res.data || []
 }
+
+export const deleteUser = async (id) => {
+    let res = await axios.delete(`http://localhost:5000/users/delete/${id}`)
+        return res.data || []
+}

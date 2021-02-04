@@ -4,6 +4,7 @@ import ModalContainerAssets from '../Helpers/Modal/ModalContainerAssets'
 import ModalFromAssets from '../Helpers/Modal/ModalFromAssets'
 import Modal from '../Helpers/Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
+import {deleteAsset} from '../../services/assetsService'
 
 const HomeContainerAssets = ({asset}) => {
     const {name, desc, location, status, _id} = asset
@@ -17,6 +18,12 @@ const HomeContainerAssets = ({asset}) => {
     const [assignedTo, setAssignedTo] = useState('None')
     const [description, setDescription] = useState('')
     const {isShownAssets, toggleAssets} = ModalContainerAssets()
+
+    const removeAsset = async() => {
+        let res = await deleteAsset(id)
+        console.log(res.asset)
+        //need to refresh the page here
+    }
 
     const onSubmit = (e) => {
         //once a person has been assigned to this asset then it gets taken off the immediate action list
@@ -35,6 +42,7 @@ const HomeContainerAssets = ({asset}) => {
                 <h3>Location: {location}</h3>
                 <button className="default-button" onClick={toggleAssets}>Edit</button>
                 <button className="button-default" onClick={toggle}><BsPersonPlusFill size={'25px'}/></button>
+                <button onClick={removeAsset}>Delete</button>
             </div>
                 <ModalFromAssets isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 assignedTo={assignedTo} setAssignedTo={setAssignedTo}

@@ -48,7 +48,21 @@ router.put('/:id', async(req, res) => {
 })
 
 //this route will delete a user
-router.delete(':id', async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
+    const { id } = req.params
+    try{
+        let user = await User.findById(id)
+        await user.remove()
+
+        return res.status(202).send({
+            error: false,
+            user
+        })
+    }catch{
+        res.status(500).send({
+            error: true
+        })
+    }
 
 })
 

@@ -48,8 +48,21 @@ router.put('/:id', async(req, res) => {
 })
 
 //this route will delete an asset
-router.delete(':id', async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
+    const { id } = req.params
+    try{
+        let asset = await Assets.findById(id)
+        await asset.remove()
 
+        return res.status(202).send({
+            error: false,
+            asset
+        })
+    }catch{
+        res.status(500).send({
+            error: true
+        })
+    }
 })
 
 module.exports = router

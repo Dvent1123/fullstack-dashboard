@@ -50,8 +50,21 @@ router.put('/:id', async(req, res) => {
 })
 
 //this route will delete a task
-router.delete(':id', async (req, res) => {
-
+router.delete('/delete/:id', async (req, res) => {
+    const { id } = req.params
+    try{
+        let task = await Tasks.findById(id)
+        await task.remove()
+        
+        return res.status(202).send({
+            error: false,
+            task
+        })
+    }catch{
+        res.status(500).send({
+            error: true
+        })
+    }
 })
 
 module.exports = router
