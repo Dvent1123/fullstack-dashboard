@@ -43,8 +43,28 @@ router.post('/new', async (req, res) => {
 })
 
 //this route will update the existing assets
-router.put('/:id', async(req, res) => {
+router.put('/edit/:id', async(req, res) => {
+    const { id } = req.params
+    let newAsset = req.body
 
+    try{
+        let asset = await Assets.findById(id)
+            asset.name = newAsset.name,
+            asset.status = newAsset.status,
+            asset.location = newAsset.location,
+            asset.desc = newAsset.desc
+
+            await asset.save()
+
+        return res.status(202).send({
+            error: false,
+            product
+        })
+    }catch{
+        res.status(500).send({
+            error: true
+        })
+    }
 })
 
 //this route will delete an asset

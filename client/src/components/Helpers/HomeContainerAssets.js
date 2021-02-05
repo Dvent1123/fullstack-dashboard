@@ -4,7 +4,7 @@ import ModalContainerAssets from '../Helpers/Modal/ModalContainerAssets'
 import ModalFromAssets from '../Helpers/Modal/ModalFromAssets'
 import Modal from '../Helpers/Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
-import {deleteAsset} from '../../services/assetsService'
+import {deleteAsset, editAsset} from '../../services/assetsService'
 
 const HomeContainerAssets = ({asset}) => {
     const {name, desc, location, status, _id} = asset
@@ -25,14 +25,32 @@ const HomeContainerAssets = ({asset}) => {
         //need to refresh the page here
     }
 
-    const onSubmit = (e) => {
-        //once a person has been assigned to this asset then it gets taken off the immediate action list
-        //so have to update that list
-        e.preventDefault()
-         console.log(assignedTo, description)
-        setAssignedTo('None')
-        setDescription('')
+    const updateAsset = async (assetObj) => {
+        let res = await editAsset(assetObj, id)
+        console.log(res)
     }
+
+    const onSubmit = (e) => {
+        e.preventDefault()
+
+        const newAsset = {
+            name: assetName,
+            status: assetStatus,
+            location: assetLocation,
+            desc: assetDesc
+        }
+
+        //if this doesn't come back with an error then 
+        //gucci gang, if it does than we'll have to
+        //make an error thing to say there was an error
+        updateAsset(newAsset)
+
+        setAssetName('')
+        setAssetStatus(0)
+        setAssetLocation('')
+        setAssetDesc('')
+    }
+
 
     return (
         <section className="second-home-container">
