@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 
-const ModalFromAssets = ({isShowing, hide, onSubmit, 
+const AssetsModal = ({isShowing, hide, onSubmit, 
     assignedTo, setAssignedTo, 
      assetName, description, setDescription}) => isShowing ? ReactDom.createPortal(
     <> 
@@ -43,4 +43,4 @@ const ModalFromAssets = ({isShowing, hide, onSubmit,
     </>, document.body
 ) : null;
 
-export default ModalFromAssets
+export default AssetsModal

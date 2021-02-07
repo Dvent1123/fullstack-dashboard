@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
-import HomeContainerTasks from '../Helpers/HomeContainerTasks'
+import TasksContainer from '../Helpers/TasksContainer'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
-import ModalTasks from '../Helpers/Modal/ModalTasks'
+import TasksModal from '../Helpers/Modal/TasksModal'
 import {getAll} from '../../services/assetsService'
 import {getAllTasks,createTask } from '../../services/tasksService'
 
 
-const HomeTasks = () => {
+const Tasks = () => {
     const [tasks, setTasks] = useState(null)
     const {isShown, toggle} = ModalContainer()
     const [createdBy, setCreatedBy] = useState('Daniel')
@@ -70,7 +70,7 @@ const HomeTasks = () => {
     const renderTasks = (filteredTask) => {
         return (
             <div key={filteredTask._id}>
-                <HomeContainerTasks task={filteredTask} assets={assets}/>
+                <TasksContainer task={filteredTask} assets={assets}/>
             </div>
         )
     }
@@ -81,7 +81,7 @@ const HomeTasks = () => {
                     <h1>Tasks</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>
                 </div>
-                <ModalTasks isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
+                <TasksModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 assignedTo={assignedTo} setAssignedTo={setAssignedTo}
                 desc={desc} setDesc={setDesc}
                 assets={assets}
@@ -136,4 +136,4 @@ const HomeTasks = () => {
     )
 }
 
-export default HomeTasks
+export default Tasks

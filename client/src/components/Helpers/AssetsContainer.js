@@ -1,32 +1,32 @@
 import React, {useState} from 'react'
-import ModalContainer from '../Helpers/Modal/ModalContainer'
-import ModalContainerAssets from '../Helpers/Modal/ModalContainerAssets'
-import ModalFromAssets from '../Helpers/Modal/ModalFromAssets'
-import Modal from '../Helpers/Modal/Modal'
+import ModalContainer from './Modal/ModalContainer'
+import AssetsModal from './Modal/AssetsModal'
+import Modal from './Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
 import {deleteAsset, editAsset} from '../../services/assetsService'
 
-const HomeContainerAssets = ({asset}) => {
+const AssetsContainer = ({asset}) => {
     const {name, desc, location, status, _id} = asset
     const [assetName, setAssetName] = useState(name)
     const [assetDesc, setAssetDesc] = useState(desc)
     const [assetLocation, setAssetLocation] = useState(location)
     const [assetStatus, setAssetStatus] = useState(status)
-    const [id, setId] = useState(_id)
     //code for Modal
     const {isShown, toggle} = ModalContainer()
+    const {isShown: isShownAssets,toggle: toggleAssets} = ModalContainer()
     const [assignedTo, setAssignedTo] = useState('None')
     const [description, setDescription] = useState('')
-    const {isShownAssets, toggleAssets} = ModalContainerAssets()
+
+
 
     const removeAsset = async() => {
-        let res = await deleteAsset(id)
+        let res = await deleteAsset(_id)
         console.log(res.asset)
         //need to refresh the page here
     }
 
     const updateAsset = async (assetObj) => {
-        let res = await editAsset(assetObj, id)
+        let res = await editAsset(assetObj, _id)
         console.log(res)
     }
 
@@ -62,7 +62,7 @@ const HomeContainerAssets = ({asset}) => {
                 <button className="button-default" onClick={toggle}><BsPersonPlusFill size={'25px'}/></button>
                 <button onClick={removeAsset}>Delete</button>
             </div>
-                <ModalFromAssets isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
+                <AssetsModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 assignedTo={assignedTo} setAssignedTo={setAssignedTo}
                 assetName={name}
                 description={description} setDescription={setDescription}/>
@@ -76,4 +76,4 @@ const HomeContainerAssets = ({asset}) => {
     )
 }
 
-export default HomeContainerAssets
+export default AssetsContainer

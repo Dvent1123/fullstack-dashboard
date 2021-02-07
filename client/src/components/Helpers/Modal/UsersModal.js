@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 
-const ModalUsers = ({isShowing, hide, onSubmit, 
+const UsersModal = ({isShowing, hide, onSubmit, 
     userName, setUserName,
     password, setPassword,
     role, setRole,
@@ -49,4 +49,4 @@ const ModalUsers = ({isShowing, hide, onSubmit,
     </>, document.body
 ) : null;
 
-export default ModalUsers
+export default UsersModal

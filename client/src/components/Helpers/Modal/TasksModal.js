@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 
-const ModalTasks = ({isShowing, hide, onSubmit, 
+const TasksModal = ({isShowing, hide, onSubmit, 
     assignedTo, setAssignedTo, 
     desc, setDesc, assets,
-    setAssignedAsset,
+    setAssignedAsset, assignedAsset,
     status, setStatus}) => isShowing ? ReactDom.createPortal(
     <> 
         <div className="modal-overlay">
@@ -35,7 +35,7 @@ const ModalTasks = ({isShowing, hide, onSubmit,
                         </div>
                         <div className="form-group">
                             <label htmlFor="assetId">Task to be completed on which Asset: </label>
-                            <select id="assetName" onChange={(e)=> setAssignedAsset(e.target.value)}>
+                            <select id="assetName" value={assignedAsset}  onChange={(e)=> setAssignedAsset(e.target.value)}>
                                 <option value="None">None</option>
                                 {
                                     assets.map((asset) => {
@@ -72,4 +72,4 @@ const ModalTasks = ({isShowing, hide, onSubmit,
     </>, document.body
 ) : null;
 
-export default ModalTasks
+export default TasksModal

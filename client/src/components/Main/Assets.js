@@ -1,11 +1,11 @@
 import React, {useState, useEffect}  from 'react'
-import HomeContainerAssets from '../Helpers/HomeContainerAssets'
+import AssetsContainer from '../Helpers/AssetsContainer'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import {getAll, createAsset} from '../../services/assetsService'
 
-const HomeAssets = () => {
+const Assets = () => {
     const [assets, setAssets] = useState(null)
     const {isShown, toggle} = ModalContainer()
     const [name, setName] = useState('')
@@ -58,7 +58,7 @@ const HomeAssets = () => {
     const renderAssets = (filteredAsset) => {
         return (
             <div key={filteredAsset._id}>
-                <HomeContainerAssets asset={filteredAsset}/>
+                <AssetsContainer asset={filteredAsset}/>
             </div>
         )
     }
@@ -123,4 +123,4 @@ const HomeAssets = () => {
     )
 }
 
-export default HomeAssets
+export default Assets

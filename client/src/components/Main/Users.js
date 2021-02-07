@@ -1,13 +1,11 @@
 import React, {useState, useEffect}  from 'react'
-import HomeContainerUsers from '../Helpers/HomeContainerUsers'
+import UsersContainer from '../Helpers/UsersContainer'
 import {AiFillPlusCircle} from 'react-icons/ai'
-import { userData } from '../../Models/user-data'
-import ModalUsers from '../Helpers/Modal/ModalUsers'
+import UsersModal from '../Helpers/Modal/UsersModal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { getAllUsers, createUser } from '../../services/usersServices'
-import axios from 'axios'
 
-const HomeUsers = () => {
+const Users = () => {
     const {isShown, toggle} = ModalContainer()
     const [users, setUsers] = useState(null)
     const [userName, setUserName] = useState('')
@@ -54,7 +52,7 @@ const HomeUsers = () => {
     const renderUsers = (user) => {
         return (
             <div key={user._id}>
-                <HomeContainerUsers user={user}/>
+                <UsersContainer user={user}/>
                 </div>
         )
     }
@@ -65,7 +63,7 @@ const HomeUsers = () => {
                     <h1>Users</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>
                 </div>
-                <ModalUsers isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
+                <UsersModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 userName={userName} setUserName={setUserName}
                 password={password} setPassword={setPassword}
                 role={role} setRole={setRole}
@@ -87,4 +85,4 @@ const HomeUsers = () => {
     )
 }
 
-export default HomeUsers
+export default Users

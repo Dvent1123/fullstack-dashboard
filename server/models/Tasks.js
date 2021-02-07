@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Asset =  require('./Assets').schema
 
 const taskSchema = new mongoose.Schema({
     createdBy: {

@@ -58,7 +58,7 @@ router.put('/edit/:id', async(req, res) => {
 
         return res.status(202).send({
             error: false,
-            product
+            asset
         })
     }catch{
         res.status(500).send({

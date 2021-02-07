@@ -1,3 +1,4 @@
+const { json } = require('body-parser')
 const express = require('express')
 const router = express.Router()
 const Tasks = require('../models/Tasks')
@@ -45,8 +46,30 @@ router.post('/new', async (req, res) => {
 })
 
 //this route will update the existing task
-router.put('/:id', async(req, res) => {
+router.put('/edit/:id', async(req, res) => {
+   const { id } = req.params
+    let newTask = req.body
+    
+    try{
+        let task = await Tasks.findById(id)
+            task.createdBy = newTask.createdBy,
+            task.assignedTo = newTask.assignedTo,
+            task.asset = newTask.asset,
+            task.status = newTask.status,
+            task.desc = newTask.desc
 
+            await task.save()
+
+            return res.status(202).send({
+                error: false,
+                task
+            })
+
+    }catch{
+        res.status(500).send({
+            error: true
+        })
+    }
 })
 
 //this route will delete a task

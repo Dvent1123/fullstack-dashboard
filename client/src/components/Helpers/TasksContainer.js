@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 import {IoCheckmarkCircleSharp} from 'react-icons/io5'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
-import ModalTasks from '../Helpers/Modal/ModalTasks'
-import {deleteTask} from '../../services/tasksService'
+import TasksModal from './Modal/TasksModal'
+import {deleteTask, editTask} from '../../services/tasksService'
 
-const HomeContainerTasks = ({task, assets}) => {
+const TasksContainer = ({task, assets}) => {
     const {assignedTo, desc,asset,status,createdBy, _id} = task
     const {isShown, toggle} = ModalContainer()
 
@@ -13,18 +13,36 @@ const HomeContainerTasks = ({task, assets}) => {
     const [taskStatus, setTaskStatus] = useState(status)
     const [taskDesc, setTaskDesc] = useState(desc)
     const [taskAsset, setTaskAsset] = useState(asset)
-    const [id, setId] = useState(_id)
 
     const removeTask = async() => {
-        let res = await deleteTask(id)
+        let res = await deleteTask(_id)
+        console.log(res.task)
+    }
+
+    const updateTask = async (taskObj) => {
+        let res = await editTask(taskObj, _id)
         console.log(res.task)
     }
 
     //where you update the tasks
     const onSubmit = (e) => {
         e.preventDefault()
-        console.log('something was submitted')
+        
+        const newTask = {
+            createdBy: taskCreatedBy,
+            assignedTo: taskAssignedTo,
+            asset: taskAsset,
+            status: taskStatus,
+            desc: taskDesc
+        }
 
+        updateTask(newTask)
+
+        setTaskCreatedBy('')
+        setTaskAssignedTo('')
+        setTaskAsset('')
+        setTaskStatus(0)
+        setTaskDesc('')
     }
 
 
@@ -38,7 +56,7 @@ const HomeContainerTasks = ({task, assets}) => {
                 <button onClick={removeTask}>Delete</button>
                 <IoCheckmarkCircleSharp size={'50px'}/>
             </div>
-                <ModalTasks isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
+                <TasksModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 assignedTo={taskAssignedTo} setAssignedTo={setTaskAssignedTo}
                 desc={taskDesc} setDesc={setTaskDesc}
                 assets={assets}
@@ -48,4 +66,4 @@ const HomeContainerTasks = ({task, assets}) => {
     )
 }
 
-export default HomeContainerTasks
+export default TasksContainer

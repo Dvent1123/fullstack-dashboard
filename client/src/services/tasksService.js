@@ -14,3 +14,8 @@ export const deleteTask = async (id) => {
     let res = await axios.delete(`http://localhost:5000/tasks/delete/${id}`)
         return res.data || []
 }
+
+export const editTask = async (updatedTask, id) => {
+    let res = await axios.put(`http://localhost:5000/tasks/edit/${id}`, updatedTask )
+        return res.data || []
+}
