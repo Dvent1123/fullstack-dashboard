@@ -51,7 +51,7 @@ const TasksModal = ({isShowing, hide, onSubmit,
                             <textarea className="form-input" value={desc} onChange={(e) => setDesc(e.target.value)} rows="5"></textarea>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="status">Status of Asset: </label>
+                            <label htmlFor="status">Status of Tasks: </label>
                             <select id="status" value={status} onChange={(e)=> setStatus(e.target.value)}>
                                 <option value="0">Select a Status</option>
                                 <option value="1">Not Complete</option>

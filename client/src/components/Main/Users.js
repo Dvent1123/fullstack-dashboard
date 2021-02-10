@@ -3,7 +3,8 @@ import UsersContainer from '../Helpers/UsersContainer'
 import {AiFillPlusCircle} from 'react-icons/ai'
 import UsersModal from '../Helpers/Modal/UsersModal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
-import { getAllUsers, createUser } from '../../services/usersServices'
+import { getAllUsers } from '../../services/usersServices'
+import {socket} from '../NavBar'
 
 const Users = () => {
     const {isShown, toggle} = ModalContainer()
@@ -18,10 +19,8 @@ const Users = () => {
         console.log(res.usersArray)
         setUsers(res.usersArray)
     }
-
     const newUserFunction = async (userObj) => {
-        let res = await createUser(userObj)
-        console.log(res)
+        socket.on('UserAdded', data => console.log(data))
     }
 
     const onSubmit = (e) => {
@@ -33,7 +32,8 @@ const Users = () => {
             job: job
         }
 
-        newUserFunction(newUser)
+        socket.emit('addUser', newUser)
+        newUserFunction()
 
         setUserName('')
         setPassword('')

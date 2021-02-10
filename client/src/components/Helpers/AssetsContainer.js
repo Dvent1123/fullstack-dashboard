@@ -3,7 +3,7 @@ import ModalContainer from './Modal/ModalContainer'
 import AssetsModal from './Modal/AssetsModal'
 import Modal from './Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
-import {deleteAsset, editAsset} from '../../services/assetsService'
+import {socket} from '../NavBar'
 
 const AssetsContainer = ({asset}) => {
     const {name, desc, location, status, _id} = asset
@@ -18,39 +18,41 @@ const AssetsContainer = ({asset}) => {
     const [description, setDescription] = useState('')
 
 
-
+    //sends the asset to remove
     const removeAsset = async() => {
-        let res = await deleteAsset(_id)
-        console.log(res.asset)
-        //need to refresh the page here
+        socket.emit('deleteAsset', _id)
+        assetRemovalReturn()
     }
 
-    const updateAsset = async (assetObj) => {
-        let res = await editAsset(assetObj, _id)
-        console.log(res)
+    //handling the return from remove asset
+    const assetRemovalReturn = async () => {
+        socket.on('AssetDeleted', (data) => console.log(data))
+    }
+
+    const updateAsset = async () => {
+        socket.on('AssetUpdated', (data) => console.log(data))
     }
 
     const onSubmit = (e) => {
         e.preventDefault()
 
         const newAsset = {
+            id: _id,
             name: assetName,
             status: assetStatus,
             location: assetLocation,
             desc: assetDesc
         }
 
-        //if this doesn't come back with an error then 
-        //gucci gang, if it does than we'll have to
-        //make an error thing to say there was an error
-        updateAsset(newAsset)
+        //emits this new asset to the server
+        socket.emit('updateAsset', newAsset)
+        updateAsset()
 
         setAssetName('')
         setAssetStatus(0)
         setAssetLocation('')
         setAssetDesc('')
     }
-
 
     return (
         <section className="second-home-container">

@@ -38,7 +38,7 @@ const Modal = ({isShowing, hide, onSubmit, setName, name, location, setLocation,
                         </div>      
                         <div className="form-group">
                             <button className="form-button" type="submit">
-                            Submit
+                                Submit
                             </button>
                         </div>
 

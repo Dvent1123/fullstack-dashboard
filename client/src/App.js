@@ -7,9 +7,10 @@ import Users from './components/Main/Users'
 //error page
 import Error from './components/Error'
 ///navbar
-import NavBar from './components/NavBar'
+import {NavBar} from './components/NavBar'
 
 const App = () => {
+
   return (
     <Router>
         <NavBar />

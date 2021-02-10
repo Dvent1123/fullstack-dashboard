@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import UsersModal from './Modal/UsersModal'
 import ModalContainer from './Modal/ModalContainer'
-import {deleteUser, editUser} from '../../services/usersServices'
+import {socket} from '../NavBar'
 
 const UsersContainer = ({user}) => {
     const {_id, username, job, password, role} = user
@@ -12,14 +12,18 @@ const UsersContainer = ({user}) => {
     const [newJob, setNewJob] = useState(job)
     const [newRole, setNewRole] = useState(role)
 
-    const removeUser = async() => {
-        let res = await deleteUser(_id)
-        console.log(res.user)
+
+    const removeUser = async () => {
+        socket.emit('deleteUser', _id)
+        userRemovalReturn()
     }
 
-    const updateUser = async (userObj) => {
-        let res = await editUser(userObj, _id)
-        console.log(res)
+    const userRemovalReturn = async () => {
+        socket.on('UserDeleted', data => console.log(data))
+    }
+
+    const updateUser = async () => {
+        socket.on('UserUpdated', data => console.log(data))
     }
 
     //where you update the tasks
@@ -27,13 +31,15 @@ const UsersContainer = ({user}) => {
         e.preventDefault()
         
         const newUser = {
+            id: _id,
             username: userName,
             password: newPassword,
             role: newRole,
             job: newJob
         }
 
-        updateUser(newUser)
+        socket.emit('updateUser', newUser)
+        updateUser()
 
         setUserName('')
         setNewPassword('')

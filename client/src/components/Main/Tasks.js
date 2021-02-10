@@ -4,8 +4,8 @@ import TasksContainer from '../Helpers/TasksContainer'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import TasksModal from '../Helpers/Modal/TasksModal'
 import {getAll} from '../../services/assetsService'
-import {getAllTasks,createTask } from '../../services/tasksService'
-
+import {getAllTasks} from '../../services/tasksService'
+import {socket} from '../NavBar'
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -29,26 +29,27 @@ const Tasks = () => {
         setTasks(res.tasksArray)
     }
 
+    const newTaskFunction = async () => {
+        socket.on('TaskAdded', (data) => console.log(data))
+    }
+
     const onSubmit = (e) => {
         e.preventDefault()
 
-    const newTask = {
-        //createdBy
-        //asset obj that it is referencing
-        //status
-            createdBy: createdBy,
-            assignedTo: assignedTo,
-            //this asset is just the asset id
-            asset: assignedAsset,
-            status: status,
-            desc: desc
-        }
+        const newTask = {
+                createdBy: createdBy,
+                assignedTo: assignedTo,
+                asset: assignedAsset,
+                status: status,
+                desc: desc
+            }
 
-        createTask(newTask)
+            socket.emit('addTask', newTask)
+            newTaskFunction()
 
-        setCreatedBy('')
-        setAssignedTo('None')
-        setDesc('')
+            setCreatedBy('')
+            setAssignedTo('None')
+            setDesc('')
     }
 
     useEffect(() => {

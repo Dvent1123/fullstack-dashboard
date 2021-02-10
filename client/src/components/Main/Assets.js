@@ -3,7 +3,8 @@ import AssetsContainer from '../Helpers/AssetsContainer'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
-import {getAll, createAsset} from '../../services/assetsService'
+import {getAll} from '../../services/assetsService'
+import {socket} from '../NavBar'
 
 const Assets = () => {
     const [assets, setAssets] = useState(null)
@@ -12,25 +13,41 @@ const Assets = () => {
     const [status, setStatus] = useState(0)
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
+    const [errorMessage, setErrorMessage] = useState(false)
+    const [successMessage, setSuccessMessage] = useState(false)
 
-    //gets the assets using the services
+   //gets the assets using the services
   const getAssets = async () => {
         let res = await getAll()
-        console.log(res.assetsArray)
         setAssets(res.assetsArray)
   };
 
-  const newAssetFunction = async (assetObj) => {
-        let res = await createAsset(assetObj)
-        console.log(res)
-    }
 
+  //THIS IS IMPORTANT, HANDLE 'data' WHICH COULD BE SUCCESSFUL OR AN ERROR
+  //IF AN ERROR HANDLE THAT AND IF SUCCESSFUL HANDLE THAT
+  const newAssetFunction = () => {
+        socket.on('AssetAdded', (result) => {
+            const {data, success} = result 
+            if(!success) {
+                //gets rid of the modal
+                toggle()
+            }else{
+                setAssets([...assets, data])
+                //have loading screen go away here
+                //toggle function toggles the modal
+                toggle()
+            }
+        })
+  }
+
+
+  //this useEffect is fine because it will only retrieve assets upon initial render not re-renders
+  //since it already got those assets
   useEffect(() => {
       if(!assets){
         getAssets();
       }
   });
-
 
 //Handles form submit for new asset
     const onSubmit = (e) => {
@@ -42,17 +59,17 @@ const Assets = () => {
             location: location,
             desc: description
         }
-
-        //if this doesn't come back with an error then 
-        //gucci gang, if it does than we'll have to
-        //make an error thing to say there was an error
-        newAssetFunction(newAsset)
+ 
+        socket.emit('addAsset', newAsset)
+        newAssetFunction()
 
         setName('')
         setStatus(0)
         setLocation('')
         setDescription('')
     }
+
+
 
     //renders the assets
     const renderAssets = (filteredAsset) => {
@@ -65,6 +82,8 @@ const Assets = () => {
 
     return (
             <section className="home-containers">
+                {errorMessage && <h3>An error was encountered :(</h3>}
+                {successMessage && <h3>{successMessage}</h3>}
                 <div className="section-title">
                     <h1>Assets</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>

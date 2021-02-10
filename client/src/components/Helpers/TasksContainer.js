@@ -2,7 +2,8 @@ import React, {useState} from 'react'
 import {IoCheckmarkCircleSharp} from 'react-icons/io5'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import TasksModal from './Modal/TasksModal'
-import {deleteTask, editTask} from '../../services/tasksService'
+import {socket} from '../NavBar'
+ 
 
 const TasksContainer = ({task, assets}) => {
     const {assignedTo, desc,asset,status,createdBy, _id} = task
@@ -15,13 +16,16 @@ const TasksContainer = ({task, assets}) => {
     const [taskAsset, setTaskAsset] = useState(asset)
 
     const removeTask = async() => {
-        let res = await deleteTask(_id)
-        console.log(res.task)
+        socket.emit('deleteTask', _id)
+        taskRemovalReturn()
     }
 
-    const updateTask = async (taskObj) => {
-        let res = await editTask(taskObj, _id)
-        console.log(res.task)
+    const taskRemovalReturn = async () => {
+        socket.on('TaskDeleted', data => console.log(data))
+    }
+
+    const updateTask = async () => {
+        socket.on('TaskUpdated', (data) => console.log(data))
     }
 
     //where you update the tasks
@@ -29,6 +33,7 @@ const TasksContainer = ({task, assets}) => {
         e.preventDefault()
         
         const newTask = {
+            id: _id,
             createdBy: taskCreatedBy,
             assignedTo: taskAssignedTo,
             asset: taskAsset,
@@ -36,7 +41,9 @@ const TasksContainer = ({task, assets}) => {
             desc: taskDesc
         }
 
-        updateTask(newTask)
+        socket.emit('updateTask' , newTask)
+
+        updateTask()
 
         setTaskCreatedBy('')
         setTaskAssignedTo('')
