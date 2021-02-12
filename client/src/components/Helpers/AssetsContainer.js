@@ -5,7 +5,7 @@ import Modal from './Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
 import {socket} from '../NavBar'
 
-const AssetsContainer = ({asset}) => {
+const AssetsContainer = ({asset, assets, setAssets}) => {
     const {name, desc, location, status, _id} = asset
     const [assetName, setAssetName] = useState(name)
     const [assetDesc, setAssetDesc] = useState(desc)
@@ -26,11 +26,29 @@ const AssetsContainer = ({asset}) => {
 
     //handling the return from remove asset
     const assetRemovalReturn = async () => {
-        socket.on('AssetDeleted', (data) => console.log(data))
+        socket.on('AssetDeleted', (result) => {
+            const {data, success} = result 
+            if(!success) {
+                //handle error here
+            }else{
+                const arrayAfterDeletion = assets.filter(item => item._id !== _id)
+                setAssets(arrayAfterDeletion)
+            }}
+        )
     }
 
     const updateAsset = async () => {
-        socket.on('AssetUpdated', (data) => console.log(data))
+        socket.on('AssetUpdated', (result) => {
+            const {data, success} = result
+            if(!success){
+                //handles error
+            }else{
+                const assetIndex = assets.findIndex(item => item._id === _id)
+                const updatedAssetsArray = [...assets]
+                updatedAssetsArray[assetIndex] = data
+                setAssets(updatedAssetsArray)
+            }
+        })
     }
 
     const onSubmit = (e) => {

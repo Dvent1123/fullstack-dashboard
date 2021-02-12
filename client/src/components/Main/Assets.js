@@ -13,8 +13,6 @@ const Assets = () => {
     const [status, setStatus] = useState(0)
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
-    const [errorMessage, setErrorMessage] = useState(false)
-    const [successMessage, setSuccessMessage] = useState(false)
 
    //gets the assets using the services
   const getAssets = async () => {
@@ -22,6 +20,7 @@ const Assets = () => {
         setAssets(res.assetsArray)
   };
 
+  //toggles the success messsage
 
   //THIS IS IMPORTANT, HANDLE 'data' WHICH COULD BE SUCCESSFUL OR AN ERROR
   //IF AN ERROR HANDLE THAT AND IF SUCCESSFUL HANDLE THAT
@@ -33,8 +32,6 @@ const Assets = () => {
                 toggle()
             }else{
                 setAssets([...assets, data])
-                //have loading screen go away here
-                //toggle function toggles the modal
                 toggle()
             }
         })
@@ -75,15 +72,13 @@ const Assets = () => {
     const renderAssets = (filteredAsset) => {
         return (
             <div key={filteredAsset._id}>
-                <AssetsContainer asset={filteredAsset}/>
+                <AssetsContainer asset={filteredAsset} assets={assets} setAssets={setAssets}/>
             </div>
         )
     }
 
     return (
             <section className="home-containers">
-                {errorMessage && <h3>An error was encountered :(</h3>}
-                {successMessage && <h3>{successMessage}</h3>}
                 <div className="section-title">
                     <h1>Assets</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>
