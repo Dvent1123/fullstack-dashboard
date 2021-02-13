@@ -31,7 +31,7 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
             if(!success) {
                 //handle error here
             }else{
-                const arrayAfterDeletion = assets.filter(item => item._id !== _id)
+                const arrayAfterDeletion = assets.filter(item => item._id !== data._id)
                 setAssets(arrayAfterDeletion)
             }}
         )
@@ -42,11 +42,13 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
             const {data, success} = result
             if(!success){
                 //handles error
+                toggle()
             }else{
-                const assetIndex = assets.findIndex(item => item._id === _id)
+                const assetIndex = assets.findIndex(item => item._id === data._id)
                 const updatedAssetsArray = [...assets]
                 updatedAssetsArray[assetIndex] = data
                 setAssets(updatedAssetsArray)
+                toggle()
             }
         })
     }
@@ -65,11 +67,6 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
         //emits this new asset to the server
         socket.emit('updateAsset', newAsset)
         updateAsset()
-
-        setAssetName('')
-        setAssetStatus(0)
-        setAssetLocation('')
-        setAssetDesc('')
     }
 
     return (

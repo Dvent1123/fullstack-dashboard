@@ -20,7 +20,6 @@ const Tasks = () => {
     //gets the assets using the services
     const getAssets = async () => {
         let res = await getAll()
-        console.log(res.assetsArray)
         setAssets(res.assetsArray)
     };
 
@@ -30,7 +29,15 @@ const Tasks = () => {
     }
 
     const newTaskFunction = async () => {
-        socket.on('TaskAdded', (data) => console.log(data))
+        socket.on('TaskAdded', (result) => {
+            const {data, success} = result
+            if(!success){
+                toggle()
+            }else{
+                setTasks([...tasks, data])
+                toggle()
+            }
+        })
     }
 
     const onSubmit = (e) => {
@@ -71,7 +78,7 @@ const Tasks = () => {
     const renderTasks = (filteredTask) => {
         return (
             <div key={filteredTask._id}>
-                <TasksContainer task={filteredTask} assets={assets}/>
+                <TasksContainer task={filteredTask} assets={assets} tasks={tasks} setTasks={setTasks}/>
             </div>
         )
     }

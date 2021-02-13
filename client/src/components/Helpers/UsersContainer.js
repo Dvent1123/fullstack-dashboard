@@ -3,7 +3,7 @@ import UsersModal from './Modal/UsersModal'
 import ModalContainer from './Modal/ModalContainer'
 import {socket} from '../NavBar'
 
-const UsersContainer = ({user}) => {
+const UsersContainer = ({user, users, setUsers}) => {
     const {_id, username, job, password, role} = user
     const {isShown, toggle} = ModalContainer()
 
@@ -19,11 +19,31 @@ const UsersContainer = ({user}) => {
     }
 
     const userRemovalReturn = async () => {
-        socket.on('UserDeleted', data => console.log(data))
+        socket.on('UserDeleted', (result) => {
+            const {data, success} = result
+            if(!success){
+                //handle error here
+            }else{
+                const arrayAfterDeletion = users.filter(item => item._id !== data._id)
+                setUsers(arrayAfterDeletion)
+            }
+        })
     }
 
     const updateUser = async () => {
-        socket.on('UserUpdated', data => console.log(data))
+        socket.on('UserUpdated', (result) => {
+            const {data, success} = result
+            if(!success){
+                //handle error
+                toggle()
+            }else{
+                const userIndex = users.findIndex(item => item._id === data._id)
+                const updatedUsersArray = [...users]
+                updatedUsersArray[userIndex] = data
+                setUsers(updatedUsersArray)
+                toggle()
+            }
+        })
     }
 
     //where you update the tasks
@@ -40,12 +60,6 @@ const UsersContainer = ({user}) => {
 
         socket.emit('updateUser', newUser)
         updateUser()
-
-        setUserName('')
-        setNewPassword('')
-        setNewRole('')
-        setNewJob('')
-
     }
 
     return (

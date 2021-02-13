@@ -16,11 +16,19 @@ const Users = () => {
 
     const getUsers = async () =>{
         let res = await getAllUsers()
-        console.log(res.usersArray)
         setUsers(res.usersArray)
     }
+
     const newUserFunction = async (userObj) => {
-        socket.on('UserAdded', data => console.log(data))
+        socket.on('UserAdded', (result) => {
+            const {data, success} = result
+            if(!success){
+                toggle()
+            }else{
+                setUsers([...users, data])
+                toggle()
+            }   
+        })
     }
 
     const onSubmit = (e) => {
@@ -52,7 +60,7 @@ const Users = () => {
     const renderUsers = (user) => {
         return (
             <div key={user._id}>
-                <UsersContainer user={user}/>
+                <UsersContainer user={user} users={users} setUsers={setUsers}/>
                 </div>
         )
     }

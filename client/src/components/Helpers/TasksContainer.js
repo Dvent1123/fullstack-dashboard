@@ -5,11 +5,10 @@ import TasksModal from './Modal/TasksModal'
 import {socket} from '../NavBar'
  
 
-const TasksContainer = ({task, assets}) => {
+const TasksContainer = ({task, assets, tasks, setTasks}) => {
     const {assignedTo, desc,asset,status,createdBy, _id} = task
     const {isShown, toggle} = ModalContainer()
 
-    const [taskCreatedBy, setTaskCreatedBy] = useState(createdBy)
     const [taskAssignedTo, setTaskAssignedTo] = useState(assignedTo)
     const [taskStatus, setTaskStatus] = useState(status)
     const [taskDesc, setTaskDesc] = useState(desc)
@@ -21,11 +20,31 @@ const TasksContainer = ({task, assets}) => {
     }
 
     const taskRemovalReturn = async () => {
-        socket.on('TaskDeleted', data => console.log(data))
+        socket.on('TaskDeleted', (result) => {
+            const {data, success} = result
+            if(!success){
+                //handle error here
+            }else{
+                const arrayAfterDeletion = tasks.filter(item => item._id !== data._id)
+                setTasks(arrayAfterDeletion)
+            }
+        })
     }
 
     const updateTask = async () => {
-        socket.on('TaskUpdated', (data) => console.log(data))
+        socket.on('TaskUpdated', (result) => {
+            const {data, success} = result
+            if(!success){
+                //handle error here
+                toggle()
+            }else{
+                const taskIndex = tasks.findIndex(item => item._id === data._id)
+                const updatedTasksArray = [...tasks]
+                updatedTasksArray[taskIndex] = data
+                setTasks(updatedTasksArray)
+                toggle()
+            }
+        })
     }
 
     //where you update the tasks
@@ -34,7 +53,7 @@ const TasksContainer = ({task, assets}) => {
         
         const newTask = {
             id: _id,
-            createdBy: taskCreatedBy,
+            createdBy: createdBy,
             assignedTo: taskAssignedTo,
             asset: taskAsset,
             status: taskStatus,
@@ -44,12 +63,6 @@ const TasksContainer = ({task, assets}) => {
         socket.emit('updateTask' , newTask)
 
         updateTask()
-
-        setTaskCreatedBy('')
-        setTaskAssignedTo('')
-        setTaskAsset('')
-        setTaskStatus(0)
-        setTaskDesc('')
     }
 
 

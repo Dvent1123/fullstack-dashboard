@@ -5,9 +5,13 @@ import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import {getAll} from '../../services/assetsService'
 import {socket} from '../NavBar'
+import Toast from '../Toast/Toast'
+import checkIcon from '../../assets/check.svg'
+import errorIcon from '../../assets/error.svg';
 
 const Assets = () => {
     const [assets, setAssets] = useState(null)
+    const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
     const {isShown, toggle} = ModalContainer()
     const [name, setName] = useState('')
     const [status, setStatus] = useState(0)
