@@ -129,7 +129,7 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
             }else{
                 const successToast = {
                     title: 'Success',
-                    description: 'Task was assigned!',
+                    description: `Task was assigned to ${data.asset}!`,
                     backgroundColor: '#5cb85c',
                     icon: checkIcon
                 }

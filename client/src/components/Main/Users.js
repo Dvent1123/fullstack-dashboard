@@ -8,6 +8,7 @@ import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
+import Loading from '../Helpers/Loading'
 
 const Users = () => {
     const {isShown, toggle} = ModalContainer()
@@ -19,6 +20,12 @@ const Users = () => {
 
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
     const [toast, setToast] = useState(null)
+
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 6000)
+    }, [])
 
 
     const getUsers = async () =>{
@@ -101,7 +108,8 @@ const Users = () => {
                 job={job} setJob={setJob}/>
                 <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
                 <section className="section-container">
-                        <div className="users">
+                        { loading === false ?
+                            (<div className="users">
                             {
                                 (users && users.length > 0) ? (
                                     users.map(user => {
@@ -111,7 +119,10 @@ const Users = () => {
                                         <p>No Users found</p>
                                 )
                             }
-                        </div>
+                            </div>) : (
+                                <Loading />
+                            )
+                        }
                     </section>
             </section>
     )

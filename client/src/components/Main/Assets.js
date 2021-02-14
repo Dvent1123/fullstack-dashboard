@@ -8,6 +8,25 @@ import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
+import Loading from '../Helpers/Loading'
+
+    // case 'info':
+    //     toastProperties = {
+    //         id,
+    //         title: 'Info',
+    //         description: 'This is an info toast component',
+    //         backgroundColor: '#5bc0de',
+    //         icon: infoIcon
+    //     }
+    //     break;
+    // case 'warning':
+    //     toastProperties = {
+    //         id,
+    //         title: 'Warning',
+    //         description: 'This is a warning toast component',
+    //         backgroundColor: '#f0ad4e',
+    //         icon: warningIcon
+    //     }
 
 const Assets = () => {
     const [assets, setAssets] = useState(null)
@@ -18,6 +37,11 @@ const Assets = () => {
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
     const [toast, setToast] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 6000)
+    }, [])
 
    //gets the assets using the services
   const getAssets = async () => {
@@ -113,36 +137,48 @@ const Assets = () => {
                     <div className="section-title">
                         <h2>Immediate Action</h2>
                     </div>                              
-                                <div className="assets">
-                                    {(assets && assets.length > 0) ? (
-                                        assets.filter(asset => asset.status === 1).map(filteredAsset => {
-                                         return renderAssets(filteredAsset)
-                                        })
-                                    ) : (
-                                        //come back and change this to something else
-                                        <p>No Assets found</p>
-                                    )}
-                                </div>
+                    {   loading === false ?           
+                        (  <div className="assets">
+                                {(assets && assets.length > 0) ? (
+                                    assets.filter(asset => asset.status === 1).map(filteredAsset => {
+                                        return renderAssets(filteredAsset)
+                                    })
+                                ) : (
+                                    //come back and change this to something else
+                                    <p>No Assets found</p>
+                                )}
+                            </div>
+                        ) : (
+                            <Loading />
+                        )
+                    }
                     </section>
                     <section className="section-container">
                     <div className="section-title">
                         <h2>Needs Service</h2>
                     </div>                              
-                                <div className="assets">
-                                    {(assets && assets.length > 0) ? (
-                                        assets.filter(asset => asset.status === 2).map(filteredAsset => {
-                                         return renderAssets(filteredAsset)
-                                        })
-                                    ) : (
-                                        //come back and change this to something else
-                                        <p>No Assets found</p>
-                                    )}
-                                </div>
+                        { loading === false ?  
+                            (<div className="assets">
+                                {(assets && assets.length > 0) ? (
+                                    assets.filter(asset => asset.status === 2).map(filteredAsset => {
+                                        return renderAssets(filteredAsset)
+                                    })
+                                ) : (
+                                    //come back and change this to something else
+                                    <p>No Assets found</p>
+                                )}
+                            </div>) :
+                            (
+                                <Loading />
+                            )
+                        }
                     </section>
                 <section className="section-container">
                     <div className="section-title">
                         <h2>All Assets</h2>
                     </div>                              
+                        {   loading === false ? 
+                            (
                                 <div className="assets">
                                     {(assets && assets.length > 0) ? (
                                         assets.filter(asset => asset.status === 1).map(filteredAsset => {
@@ -153,6 +189,10 @@ const Assets = () => {
                                         <p>No Assets found</p>
                                     )}
                                 </div>
+                            ) : (
+                                <Loading />
+                            )
+                        }
                     </section>
             </section>
     )

@@ -9,6 +9,7 @@ import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
+import Loading from '../Helpers/Loading'
 
 
 const Tasks = () => {
@@ -23,6 +24,13 @@ const Tasks = () => {
 
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
     const [toast, setToast] = useState(null)
+
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => setLoading(false), 6000)
+    }, [])
+
     //gets the assets using the services
     const getAssets = async () => {
         let res = await getAll()
@@ -123,7 +131,8 @@ const Tasks = () => {
                     <div className="section-title">
                         <h2>Not Complete</h2>
                     </div>
-                            <div className="tasks">
+                            { loading === false ?
+                                (<div className="tasks">
                                     {(tasks && tasks.length > 0) ? (
                                         tasks.filter(task => task.status === 1).map(filteredTask => {
                                          return renderTasks(filteredTask)
@@ -132,13 +141,17 @@ const Tasks = () => {
                                         //come back and change this to something else
                                         <p>No tasks found</p>
                                     )}
-                            </div>
+                                </div>) : (
+                                    <Loading />
+                                )
+                            }
                     </section>
                 <section className="section-container">
                     <div className="section-title">
                         <h2>In Progress</h2>
                     </div>
-                            <div className="tasks">
+                            { loading === false ?
+                                (<div className="tasks">
                                     {(tasks && tasks.length > 0) ? (
                                         tasks.filter(task => task.status === 2).map(filteredTask => {
                                          return renderTasks(filteredTask)
@@ -147,13 +160,17 @@ const Tasks = () => {
                                         //come back and change this to something else
                                         <p>No tasks found</p>
                                     )}
-                            </div>
+                                </div>) : (
+                                    <Loading />
+                                )
+                            }
                 </section>
                 <section className="section-container">
                     <div className="section-title">
                         <h2>Pending Approval</h2>
                     </div>
-                            <div className="tasks">
+                            { loading === false ?
+                                (<div className="tasks">
                                     {(tasks && tasks.length > 0) ? (
                                         tasks.filter(task => task.status === 3).map(filteredTask => {
                                          return renderTasks(filteredTask)
@@ -162,7 +179,10 @@ const Tasks = () => {
                                         //come back and change this to something else
                                         <p>No tasks found</p>
                                     )}
-                            </div>
+                                </div>) : (
+                                    <Loading />
+                                )
+                            }
                 </section>
             </section>
     )
