@@ -2,6 +2,9 @@ import React, {useState} from 'react'
 import UsersModal from './Modal/UsersModal'
 import ModalContainer from './Modal/ModalContainer'
 import {socket} from '../NavBar'
+import Toast from '../Toast/Toast'
+import checkIcon from '../../assets/check.svg'
+import errorIcon from '../../assets/error.svg';
 
 const UsersContainer = ({user, users, setUsers}) => {
     const {_id, username, job, password, role} = user
@@ -11,6 +14,9 @@ const UsersContainer = ({user, users, setUsers}) => {
     const [newPassword, setNewPassword] = useState(password)
     const [newJob, setNewJob] = useState(job)
     const [newRole, setNewRole] = useState(role)
+
+    const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
+    const [toast, setToast] = useState(null)
 
 
     const removeUser = async () => {
@@ -22,10 +28,27 @@ const UsersContainer = ({user, users, setUsers}) => {
         socket.on('UserDeleted', (result) => {
             const {data, success} = result
             if(!success){
-                //handle error here
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+                toggleToast()            
             }else{
                 const arrayAfterDeletion = users.filter(item => item._id !== data._id)
                 setUsers(arrayAfterDeletion)
+                const successToast = {
+                    title: 'Success',
+                    description: 'User deleted!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
+                toggle()
+                toggleToast()
             }
         })
     }
@@ -34,14 +57,30 @@ const UsersContainer = ({user, users, setUsers}) => {
         socket.on('UserUpdated', (result) => {
             const {data, success} = result
             if(!success){
-                //handle error
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+                toggleToast()                
                 toggle()
             }else{
                 const userIndex = users.findIndex(item => item._id === data._id)
                 const updatedUsersArray = [...users]
                 updatedUsersArray[userIndex] = data
                 setUsers(updatedUsersArray)
+                const successToast = {
+                    title: 'Success',
+                    description: 'The user was updated!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
                 toggle()
+                toggleToast()
             }
         })
     }
@@ -71,6 +110,7 @@ const UsersContainer = ({user, users, setUsers}) => {
                 <button onClick={toggle}>Edit</button>
                 <button onClick={removeUser}>Delete</button>
             </div>
+                <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
                 <UsersModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 userName={userName} setUserName={setUserName}
                 password={newPassword} setPassword={setNewPassword}

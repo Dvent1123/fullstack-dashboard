@@ -6,6 +6,10 @@ import TasksModal from '../Helpers/Modal/TasksModal'
 import {getAll} from '../../services/assetsService'
 import {getAllTasks} from '../../services/tasksService'
 import {socket} from '../NavBar'
+import Toast from '../Toast/Toast'
+import checkIcon from '../../assets/check.svg'
+import errorIcon from '../../assets/error.svg';
+
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -17,6 +21,8 @@ const Tasks = () => {
     const [assets, setAssets] = useState(null)
     const [assignedAsset, setAssignedAsset] = useState('')
 
+    const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
+    const [toast, setToast] = useState(null)
     //gets the assets using the services
     const getAssets = async () => {
         let res = await getAll()
@@ -32,10 +38,27 @@ const Tasks = () => {
         socket.on('TaskAdded', (result) => {
             const {data, success} = result
             if(!success){
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
                 toggle()
+                toggleToast()
             }else{
                 setTasks([...tasks, data])
+                const successToast = {
+                    title: 'Success',
+                    description: 'Task added!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
                 toggle()
+                toggleToast()
             }
         })
     }
@@ -89,6 +112,7 @@ const Tasks = () => {
                     <h1>Tasks</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>
                 </div>
+                <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
                 <TasksModal isShowing={isShown} hide={toggle} onSubmit={onSubmit} 
                 assignedTo={assignedTo} setAssignedTo={setAssignedTo}
                 desc={desc} setDesc={setDesc}

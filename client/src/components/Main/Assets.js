@@ -17,6 +17,7 @@ const Assets = () => {
     const [status, setStatus] = useState(0)
     const [location, setLocation] = useState('')
     const [description, setDescription] = useState('')
+    const [toast, setToast] = useState(null)
 
    //gets the assets using the services
   const getAssets = async () => {
@@ -28,27 +29,42 @@ const Assets = () => {
 
   //THIS IS IMPORTANT, HANDLE 'data' WHICH COULD BE SUCCESSFUL OR AN ERROR
   //IF AN ERROR HANDLE THAT AND IF SUCCESSFUL HANDLE THAT
-  const newAssetFunction = () => {
+  const newAssetFunction = async () => {
         socket.on('AssetAdded', (result) => {
             const {data, success} = result 
             if(!success) {
-                //gets rid of the modal
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
                 toggle()
+                toggleToast()
             }else{
                 setAssets([...assets, data])
+                const successToast = {
+                    title: 'Success',
+                    description: 'Asset added!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
                 toggle()
+                toggleToast()
             }
         })
   }
 
 
-  //this useEffect is fine because it will only retrieve assets upon initial render not re-renders
-  //since it already got those assets
   useEffect(() => {
       if(!assets){
         getAssets();
       }
   });
+
 
 //Handles form submit for new asset
     const onSubmit = (e) => {
@@ -92,6 +108,7 @@ const Assets = () => {
                 setStatus={setStatus} status={status}
                 setLocation={setLocation} location={location}
                 setDescription={setDescription} description={description}/>
+                <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
                 <section className="section-container">
                     <div className="section-title">
                         <h2>Immediate Action</h2>

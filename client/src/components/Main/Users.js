@@ -5,6 +5,9 @@ import UsersModal from '../Helpers/Modal/UsersModal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { getAllUsers } from '../../services/usersServices'
 import {socket} from '../NavBar'
+import Toast from '../Toast/Toast'
+import checkIcon from '../../assets/check.svg'
+import errorIcon from '../../assets/error.svg';
 
 const Users = () => {
     const {isShown, toggle} = ModalContainer()
@@ -13,6 +16,10 @@ const Users = () => {
     const [password, setPassword] = useState('')
     const [job, setJob] = useState('')
     const [role, setRole] = useState('User')
+
+    const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
+    const [toast, setToast] = useState(null)
+
 
     const getUsers = async () =>{
         let res = await getAllUsers()
@@ -23,11 +30,27 @@ const Users = () => {
         socket.on('UserAdded', (result) => {
             const {data, success} = result
             if(!success){
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
                 toggle()
+                toggleToast()            
             }else{
                 setUsers([...users, data])
+                const successToast = {
+                    title: 'Success',
+                    description: 'User added!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
                 toggle()
-            }   
+                toggleToast()            }   
         })
     }
 
@@ -76,6 +99,7 @@ const Users = () => {
                 password={password} setPassword={setPassword}
                 role={role} setRole={setRole}
                 job={job} setJob={setJob}/>
+                <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
                 <section className="section-container">
                         <div className="users">
                             {

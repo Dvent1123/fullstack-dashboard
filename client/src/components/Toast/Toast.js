@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import ReactDom from 'react-dom'
 import '../../assets/Toast.css'
 
-const Toast = (props) => {
 //THIS IS WHAT A TOAST LOOKS LIKE
     //     {
     //   id: 1,
@@ -10,13 +10,13 @@ const Toast = (props) => {
     //   backgroundColor: '#5cb85c',
     //   icon: checkIcon
     // }
-    const { toast, position } = props
 
-    return (
+
+const Toast = ({ toast, position, isShowing, hide })  => isShowing ? ReactDom.createPortal(
         <>
             <div className={`notification-container ${position}`}>
                         <div className={`notification toast ${position}`} style={{backgroundColor: toast.backgroundColor}}>
-                            <button>
+                            <button onClick={hide}>
                                 X
                             </button>
                             <div className="notification-image">
@@ -30,9 +30,7 @@ const Toast = (props) => {
                             </div>
                         </div>
             </div>
-        </>
-
-    )
-}
+        </>, document.body
+) : null;
 
 export default Toast
