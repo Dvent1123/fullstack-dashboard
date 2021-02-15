@@ -15,6 +15,7 @@ const tasksRouter = require('./routes/tasks')
 const assetsController = require('./controllers/assetsController')
 const tasksController = require('./controllers/tasksController')
 const usersController = require('./controllers/usersController')
+const authRoutes = require('./routes/auth')
 const server= require('http').createServer(app)
 const io = require('socket.io')(server, {
     cors: {
@@ -91,6 +92,7 @@ app.use('/', indexRouter)
 app.use('/users', usersRouter)
 app.use('/assets', assetsRouter)
 app.use('/tasks', tasksRouter)
+app.use('/login', authRoutes)
 
 server.listen(port, ()=> {
     console.log('server is running')
