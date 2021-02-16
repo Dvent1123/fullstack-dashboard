@@ -8,27 +8,25 @@ exports.signup = (req, res, next) => {
 
     let errors = [];
     if (!username) {
-        errors.push({ username: "required" });
+        errors.push({ messagee: "Username is required" });
     }
     if (!password) {
-        errors.push({ password: "required" });
+        errors.push({ message: "Password is required" });
     }
     if (!password_confirmation) {
-        errors.push({
-        password_confirmation: "required",
-        });
+        errors.push({ message: "Password confirmation is required"});
     }
     if (password != password_confirmation) {
-        errors.push({ password: "mismatch" });
+        errors.push({ message: "The password and confirmation do not match" });
     }
     if (errors.length > 0) {
-        return res.status(422).json({ errors: errors });
+        return res.status(422).send({ errors: errors });
     }
 
     User.findOne({username: username})
         .then(user => {
             if(user){
-                return res.status(422).json({errors: [{user: 'email already exists'}]})
+                return res.status(422).send({errors: [{message: "The user already exists"}]})
             } else {
                 //if you're signingup then you must be an admin
                 //or else the admin will add you to a project
@@ -45,21 +43,21 @@ exports.signup = (req, res, next) => {
                         user.password = hash
                         user.save()
                             .then(response => {
-                                res.status(200).json({
+                                res.status(200).send({
                                     success: true,
                                     result: response
                                 })
                             })
                             .catch(err => {
-                                res.status(500).json({
+                                res.status(500).send({
                                     errors: [{ error: err }]
                                 })
                             })
                     })
                 })
                 .catch(err => {
-                    res.status(500).json({
-                        errors: [{error: 'something went wrong'}]
+                    res.status(500).send({
+                        errors: [{message: 'Something went wrong'}]
                     })
                 })
             }
@@ -71,27 +69,27 @@ exports.signin = (req, res) => {
 
      let errors = [];
     if (!username) {
-        errors.push({ username: "required" });
+        errors.push({ message: "Username is required" });
     }
      if (!password) {
-       errors.push({ passowrd: "required" });
+       errors.push({ message: "Password is required" });
      }
      if (errors.length > 0) {
-      return res.status(422).json({ errors: errors });
+      return res.status(422).send({ errors: errors });
      }
 
     User.findOne({ username: username})
         .then(user => {
             if(!user) {
-                return res.status(404).json({
-                    errors: [{ user: 'not found' }]
+                return res.status(404).send({
+                    errors: [{ message: "User was not found" }]
                 })
             } else {
                 bcrypt.compare(password, user.password)
                     .then(isMatch => {
                         //if password doesn't match
                         if(!isMatch) {
-                            return res.status(400).json({errors: [{ password: 'incorrect' }]})
+                            return res.status(400).send({errors: [{ message: "Password was incorrect" }]})
                         }
                         //if password does match then create token
                         let access_token = createJWT(
@@ -101,10 +99,10 @@ exports.signin = (req, res) => {
                         )
                         jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
                             if(err) {
-                                res.status(500).json({errors: err})
+                                res.status(500).send({errors: err})
                             }
                             if (decoded) {
-                                return res.status(200).json({
+                                return res.status(200).send({
                                     success: true,
                                     token: access_token,
                                     message: user
@@ -112,11 +110,11 @@ exports.signin = (req, res) => {
                             }
                         })
                     }).catch(err => {
-                        res.status(500).json({ errors: err })
+                        res.status(500).send({ errors: err })
                     })
             }
         }).catch(err => {
-            res.status(500).json({errors: err})
+            res.status(500).send({errors: err})
         })
 }
 

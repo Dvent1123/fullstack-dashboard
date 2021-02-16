@@ -1,19 +1,62 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../../assets/Register.css'
+import Toast from '../Toast/Toast'
+import checkIcon from '../../assets/check.svg'
+import errorIcon from '../../assets/error.svg';
+import ModalContainer from '../Helpers/Modal/ModalContainer'
+
+import { registerUser} from '../../services/loginServices'
+
 
 const Register = () => {
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [password2, setPassword2] = useState('')
+    const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
+    const [toast, setToast] = useState(null)
+
+
+    //this code works and it also logs the specific error
+    const registerNewUser = async (newUser) => {
+        try{
+            let res = await registerUser(newUser)
+            if(res){
+                console.log('this worked')
+            }
+        }catch(error){
+            const errorData = error.response.data
+            const errorMessage = errorData.errors[0].message
+
+                const errorToast = {
+                title: 'Danger',
+                description: `${errorMessage}`,
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+                toggleToast()        }
+    }
 
     const onSubmit = (e) => {
         e.preventDefault()
-        console.log(password, userName, password2)
+        const newUserObj = {
+            username: userName,
+            password: password,
+            password_confirmation: password2
+        }
+
+        registerNewUser(newUserObj)
+
+        setUserName('')
+        setPassword('')
+        setPassword2('')
     }
 
     return (
         <div className='register'>
+            <Toast toast={toast} position={'bottom-right'} isShowing={isShownToast} hide={toggleToast}/>
             <div className="register-wrapper">
             <Link to="/" className="btn-flat waves-effect">
               <i>Back to home</i> 
@@ -27,7 +70,7 @@ const Register = () => {
                         <hr/>
 
                         <label htmlFor="username"><b>Username</b></label>
-                        <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Enter Username" name="username" id="username" required />
+                        <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Enter Username" name="username" id="username"/>
 
                         <label htmlFor="psw"><b>Password</b></label>
                         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter Password" name="psw" id="psw" required />
