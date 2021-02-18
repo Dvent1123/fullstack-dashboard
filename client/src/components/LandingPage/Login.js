@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import '../../assets/Login.css'
 import { loginUser} from '../../services/loginServices'
 import Toast from '../Toast/Toast'
-import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import ModalContainer from '../Helpers/Modal/ModalContainer'
+import useToken from '../../utils/useToken'
 
 
 const Login = () => {
@@ -13,16 +13,19 @@ const Login = () => {
     const [username, setUserName] = useState('')
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
     const [toast, setToast] = useState(null)
+    const { token, setToken } = useToken()
 
         //this code works and it also logs the specific error
     const loginNewUser = async (newUser) => {
         try{
-            let res = await loginUser(newUser)
-            if(res){
-                console.log('this worked')
-                console.log(res)
-            }
+            const res = await loginUser(newUser).then(newToken => 
+                {
+                    return newToken
+                })
+            setToken(res)
+
         }catch(error){
+            console.log(error)
             const errorData = error.response.data
             const errorMessage = errorData.errors[0].message
 
@@ -37,6 +40,12 @@ const Login = () => {
                 toggleToast()
         }
     }
+
+    useEffect(() => {
+        if(token){
+             window.location.href = './home'
+        }
+    }, [token])
 
     const onSubmit = (e) => {
         e.preventDefault()

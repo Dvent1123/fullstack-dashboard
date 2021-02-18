@@ -8,6 +8,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const port = 5000 || process.env.PORT
+const passport = require('passport')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const assetsRouter = require('./routes/assets')
@@ -24,7 +25,8 @@ const io = require('socket.io')(server, {
     }
 })
 app.use(cors())
-
+app.use(passport.initialize())
+require('./config/passport')
 
 
 //socket.io connection

@@ -10,7 +10,8 @@ import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
-
+import Nav from '../Main/Nav'
+import useToken from '../../utils/useToken'
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -26,6 +27,8 @@ const Tasks = () => {
     const [toast, setToast] = useState(null)
 
     const [loading, setLoading] = useState(true)
+    const { token, setToken } = useToken()
+
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 6000)
@@ -33,12 +36,15 @@ const Tasks = () => {
 
     //gets the assets using the services
     const getAssets = async () => {
-        let res = await getAll()
+        const parseToken = JSON.parse(token)
+        console.log(parseToken.token)
+        let res = await getAll(parseToken.token)
         setAssets(res.assetsArray)
     };
 
     const getTasks = async () => {
-        let res = await getAllTasks()
+        const parseToken = JSON.parse(token)
+        let res = await getAllTasks(parseToken.token)
         setTasks(res.tasksArray)
     }
 
@@ -116,6 +122,7 @@ const Tasks = () => {
 
     return (
             <section className="home-containers">
+                <Nav />
                 <div className="section-title">
                     <h1>Tasks</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>

@@ -91,24 +91,29 @@ exports.signin = (req, res) => {
                         if(!isMatch) {
                             return res.status(400).send({errors: [{ message: "Password was incorrect" }]})
                         }
-                        //if password does match then create token
+                        //if password does match then create token (payload)
+                        //this creates as well as signs the token
+                        //it returns payload, secret key, and time it expires in
+                        //for id do payload.userId
                         let access_token = createJWT(
                             user.username,
                             user._id,
                             3600
                         )
-                        jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
-                            if(err) {
-                                res.status(500).send({errors: err})
-                            }
-                            if (decoded) {
-                                return res.status(200).send({
-                                    success: true,
-                                    token: access_token,
-                                    message: user
-                                })
-                            }
-                        })
+
+                        return res.status(200).send({succes:true, token: access_token})
+                        // jwt.verify(access_token, process.env.TOKEN_SECRET, (err, decoded) => {
+                        //     if(err) {
+                        //         res.status(500).send({errors: err})
+                        //     }
+                        //     if (decoded) {
+                        //         return res.status(200).send({
+                        //             success: true,
+                        //             token: access_token,
+                        //             message: user
+                        //         })
+                        //     }
+                        // })
                     }).catch(err => {
                         res.status(500).send({ errors: err })
                     })

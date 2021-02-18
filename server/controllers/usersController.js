@@ -1,19 +1,30 @@
 const mongoose = require('mongoose')
 const User = require('../models/Users')
+const passport = require('passport')
 
 exports.getUsers = async (req, res) => {
-    let usersArray = []
-    try{
-        usersArray = await User.find({})
-        return res.status(201).send({
-            error: false,
-            usersArray
-        })
-    }catch{
-        res.status(500).send({
-            error: true
-        })
-    }
+    passport.authenticate('jwt', {session: false}, async (err, user,info) => {
+        if(err) {
+            console.log(err)
+        }
+        if(info != undefined) {
+            console.log(info.message)
+            res.send(info.message)
+        }else {
+            let usersArray = []
+            try{
+                usersArray = await User.find({})
+                return res.status(201).send({
+                    error: false,
+                    usersArray
+                })
+            }catch{
+                res.status(500).send({
+                    error: true
+                })
+            }
+        }
+    }) (req, res)
 }
 
 exports.newUser= async (io, userFromServer) => {

@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import '../../assets/Register.css'
 import Toast from '../Toast/Toast'
-import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 
@@ -15,6 +14,7 @@ const Register = () => {
     const [password2, setPassword2] = useState('')
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
     const [toast, setToast] = useState(null)
+    const history = useHistory()
 
 
     //this code works and it also logs the specific error
@@ -22,7 +22,7 @@ const Register = () => {
         try{
             let res = await registerUser(newUser)
             if(res){
-                console.log('this worked')
+                history.push('/login')
             }
         }catch(error){
             const errorData = error.response.data

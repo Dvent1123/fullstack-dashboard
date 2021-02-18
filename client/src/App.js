@@ -1,35 +1,34 @@
 import React from 'react'
-import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
-// import Home from './components/Main/Home'
+import {BrowserRouter, BrowserRouter as Switch} from 'react-router-dom'
+import Home from './components/Main/Home'
 import Tasks from './components/Main/Tasks'
 import Assets from './components/Main/Assets'
 import Users from './components/Main/Users'
 import Landing from './components/LandingPage/Landing'
-//error page
-import Error from './components/Error'
 ///navbar
 import {NavBar} from './components/NavBar'
 import Register from './components/LandingPage/Register'
 import Login from './components/LandingPage/Login'
+import useToken from './utils/useToken'
+import PrivateRoute from './utils/PrivateRoute'
+import PublicRoute from './utils/PublicRoute'
 
 const App = () => {
+  const { token, setToken } = useToken()
 
   return (
-    <Router>
-        <NavBar />
-        {/* <Home /> */}
-        {/* <Landing /> */}
-
-        <Switch>
-            <Route path='/' exact component={Landing} />
-            <Route path='/register' exact component={Register} />
-            <Route path='/login' exact component={Login} />
-            <Route path='/assets' component={Assets}/>
-            <Route path='/tasks' exact component={Tasks} />
-            <Route path='/users' exact component={Users} />
-            <Route path='*' component={Error}/>
-        </Switch>
-    </Router>
+    <BrowserRouter>
+      <NavBar />
+      <Switch>
+        <PrivateRoute component={Home} token={token} path='/home' exact />
+        <PublicRoute restricted={false} token={token} component={Landing} path='/' exact/>
+        <PublicRoute restricted={false} token={token} component={Register} path='/register' exact />
+        <PublicRoute restricted={true} token={token} component={Login} path='/login' exact/>
+        <PrivateRoute component={Assets} token={token} path='/assets' exact />
+        <PrivateRoute component={Tasks} token={token} path='/tasks' exact />
+        <PrivateRoute component={Users} token={token} path='/users' exact />
+      </Switch>
+    </BrowserRouter>
   )
 }
 

@@ -1,19 +1,31 @@
 const mongoose = require('mongoose')
 const Assets = require('../models/Assets')
+const passport = require('passport')
 
 exports.getAssets = async (req, res) => {
-    let assetsArray = []
-    try{
-        assetsArray = await Assets.find({})
-        return res.status(201).send({
-            error: false,
-            assetsArray
-        })
-    }catch{
-        res.status(500).send({
-            error: true,
-        })
-    }
+    //the user info is in user and the error is in info
+    passport.authenticate('jwt', {session: false}, async (err, user,info) => {
+        if(err) {
+            console.log(err)
+        }
+        if(info != undefined) {
+            console.log(info.message)
+            res.send(info.message)
+        }else {
+            let assetsArray = []
+            try{
+                assetsArray = await Assets.find({})
+                return res.status(201).send({
+                    error: false,
+                    assetsArray
+                })
+            }catch{
+                res.status(500).send({
+                    error: true,
+                })
+            }
+        }
+    }) (req, res)
 }
 
 exports.newAsset = async (io, assetFromServer) => {

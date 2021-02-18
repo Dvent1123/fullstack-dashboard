@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-
-const Home = () => {
+const Nav = () => {
     return (
         <div className="home-container">
             <div className="nav-container">
@@ -19,9 +18,7 @@ const Home = () => {
             </ul>
             </div>
         </div>
-
-
     )
 }
 
-export default Home
+export default Nav

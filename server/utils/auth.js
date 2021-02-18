@@ -7,7 +7,9 @@ exports.createJWT = ( username, userId, duration) => {
         duration
     }
 
-    return jwt.sign(payload, process.env.TOKEN_SECRET, {
-        expiresIn: duration
-    })
+    return jwt.sign(
+        payload, 
+        process.env.TOKEN_SECRET, 
+        { expiresIn: duration }
+        )
 }

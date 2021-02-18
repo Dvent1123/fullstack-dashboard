@@ -9,6 +9,9 @@ import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
+import Nav from '../Main/Nav'
+import useToken from '../../utils/useToken'
+
 
 const Users = () => {
     const {isShown, toggle} = ModalContainer()
@@ -22,6 +25,7 @@ const Users = () => {
     const [toast, setToast] = useState(null)
 
     const [loading, setLoading] = useState(true)
+    const { token, setToken } = useToken()
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 6000)
@@ -29,7 +33,8 @@ const Users = () => {
 
 
     const getUsers = async () =>{
-        let res = await getAllUsers()
+        const parseToken = JSON.parse(token)
+        let res = await getAllUsers(parseToken.token)
         setUsers(res.usersArray)
     }
 
@@ -97,6 +102,7 @@ const Users = () => {
 
     return (
             <section className="home-containers">
+                <Nav />
                 <div className="section-title">
                     <h1>Users</h1>
                     <button className="button-default" onClick={toggle}><AiFillPlusCircle size={'40px'}/></button>

@@ -1,19 +1,32 @@
 const mongoose = require('mongoose')
 const Tasks = require('../models/Tasks')
+const passport = require('passport')
 
 exports.getTasks = async (req, res) => {
-    let tasksArray = []
-    try{
-        tasksArray = await Tasks.find({})
-        return res.status(201).send({
-            error: false,
-            tasksArray
-        })
-    }catch{
-        res.status(500).send({
-            error: true
-        })
-    }
+    passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+      if (err) {
+        console.log(err);
+      }
+      if (info != undefined) {
+        console.log(user + ' this is a user in task')
+        console.log(info.message + ' this is in tasks');
+        res.send(info.message)
+      } else {
+            let tasksArray = []
+            try{
+                console.log('does it make it to the try block')
+                tasksArray = await Tasks.find({})
+                return res.status(201).send({
+                    error: false,
+                    tasksArray
+                })
+            }catch{
+                res.status(500).send({
+                    error: true
+                })
+            }
+      }
+    }) (req, res)
 }
 
 exports.newTask = async (io, taskFromServer) => {
