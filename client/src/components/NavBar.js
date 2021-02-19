@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-let socket;
 
 const NavBar = () => {
   const handleLogout =() => {
@@ -19,4 +18,4 @@ const NavBar = () => {
     )
 }
 
-export  {NavBar, socket}
+export default NavBar

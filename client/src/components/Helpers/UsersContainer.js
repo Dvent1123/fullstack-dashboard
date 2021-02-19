@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import UsersModal from './Modal/UsersModal'
 import ModalContainer from './Modal/ModalContainer'
-import {socket} from '../NavBar'
+import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';

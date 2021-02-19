@@ -5,13 +5,13 @@ import ModalContainer from '../Helpers/Modal/ModalContainer'
 import TasksModal from '../Helpers/Modal/TasksModal'
 import {getAll} from '../../services/assetsService'
 import {getAllTasks} from '../../services/tasksService'
-import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
+import {socket} from '../Main/Home'
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -27,11 +27,14 @@ const Tasks = () => {
     const [toast, setToast] = useState(null)
 
     const [loading, setLoading] = useState(true)
-    const { token, setToken } = useToken()
+    const { token} = useToken()
 
 
     useEffect(() => {
-        setTimeout(() => setLoading(false), 6000)
+        let timer = setTimeout(() => setLoading(false), 6000)
+        return () => {
+            clearTimeout(timer)
+        }
     }, [])
 
     //gets the assets using the services

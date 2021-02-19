@@ -2,11 +2,10 @@ import React, {useState} from 'react'
 import {IoCheckmarkCircleSharp} from 'react-icons/io5'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import TasksModal from './Modal/TasksModal'
-import {socket} from '../NavBar'
+import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
-
 
 const TasksContainer = ({task, assets, tasks, setTasks}) => {
     const {assignedTo, desc,asset,status,createdBy, _id} = task

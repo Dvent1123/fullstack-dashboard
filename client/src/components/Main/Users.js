@@ -4,13 +4,14 @@ import {AiFillPlusCircle} from 'react-icons/ai'
 import UsersModal from '../Helpers/Modal/UsersModal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { getAllUsers } from '../../services/usersServices'
-import {socket} from '../NavBar'
+// import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
+import {socket} from '../Main/Home'
 
 
 const Users = () => {
@@ -25,10 +26,13 @@ const Users = () => {
     const [toast, setToast] = useState(null)
 
     const [loading, setLoading] = useState(true)
-    const { token, setToken } = useToken()
+    const { token } = useToken()
 
     useEffect(() => {
-        setTimeout(() => setLoading(false), 6000)
+        let timer = setTimeout(() => setLoading(false), 6000)
+        return () => {
+            clearTimeout(timer)
+        }
     }, [])
 
 

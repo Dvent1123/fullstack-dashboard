@@ -3,7 +3,7 @@ import ModalContainer from './Modal/ModalContainer'
 import AssetsModal from './Modal/AssetsModal'
 import Modal from './Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
-import {socket} from '../NavBar'
+import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';

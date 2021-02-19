@@ -1,12 +1,12 @@
 import React from 'react'
 import {BrowserRouter, BrowserRouter as Switch} from 'react-router-dom'
-import Home from './components/Main/Home'
+import {Home} from './components/Main/Home'
 import Tasks from './components/Main/Tasks'
 import Assets from './components/Main/Assets'
 import Users from './components/Main/Users'
 import Landing from './components/LandingPage/Landing'
 ///navbar
-import {NavBar} from './components/NavBar'
+import NavBar from './components/NavBar'
 import Register from './components/LandingPage/Register'
 import Login from './components/LandingPage/Login'
 import useToken from './utils/useToken'
@@ -14,7 +14,7 @@ import PrivateRoute from './utils/PrivateRoute'
 import PublicRoute from './utils/PublicRoute'
 
 const App = () => {
-  const { token, setToken } = useToken()
+  const { token } = useToken()
 
   return (
     <BrowserRouter>

@@ -8,13 +8,10 @@ exports.getTasks = async (req, res) => {
         console.log(err);
       }
       if (info != undefined) {
-        console.log(user + ' this is a user in task')
-        console.log(info.message + ' this is in tasks');
         res.send(info.message)
       } else {
             let tasksArray = []
             try{
-                console.log('does it make it to the try block')
                 tasksArray = await Tasks.find({})
                 return res.status(201).send({
                     error: false,

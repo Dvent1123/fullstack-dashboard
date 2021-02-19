@@ -24,56 +24,69 @@ const io = require('socket.io')(server, {
         methods: ['GET', 'POST']
     }
 })
+const jwt = require('jsonwebtoken')
 app.use(cors())
 app.use(passport.initialize())
 require('./config/passport')
 
+io.use(function(socket, next){
+  if (socket.handshake.auth){
+    jwt.verify(socket.handshake.auth.token, process.env.TOKEN_SECRET, function(err, decoded) {
+      if (err) return next(new Error('Authentication error'));
+      socket.decoded = decoded;
+      next();
+    });
+  }
+  else {
+    next(new Error('Authentication error'));
+  }    
+})
+
 
 //socket.io connection
 io.on('connection', socket => {
-  console.log('New Client Connected');
-  //this makes a req to the controller to add a new asset
-    socket.on('addAsset', data => {
-        assetsController.newAsset(io, data)
-    })
-    //this makes a req to the controller to update the asset
-    socket.on('updateAsset', data => {
-        assetsController.updateAsset(io, data)
-    })
+        console.log('new client connected')
+            socket.on('addAsset', data => {
+                assetsController.newAsset(io, data)
+            })
+            //this makes a req to the controller to update the asset
+            socket.on('updateAsset', data => {
+                assetsController.updateAsset(io, data)
+            })
 
-    socket.on('deleteAsset', id => {
-        assetsController.deleteAsset(io, id)
-    })
+            socket.on('deleteAsset', id => {
+                assetsController.deleteAsset(io, id)
+            })
 
-    //making req to controller to add task
-    socket.on('addTask', data => {
-        tasksController.newTask(io, data)
-    })
+            //making req to controller to add task
+            socket.on('addTask', data => {
+                tasksController.newTask(io, data)
+            })
 
-    socket.on('updateTask', data => {
-        tasksController.updateTask(io, data)
-    })
+            socket.on('updateTask', data => {
+                tasksController.updateTask(io, data)
+            })
 
-    socket.on('deleteTask', id => {
-        tasksController.deleteTask(io, id)
-    })
+            socket.on('deleteTask', id => {
+                tasksController.deleteTask(io, id)
+            })
 
-    socket.on('addUser', data => {
-        usersController.newUser(io, data)
-    })
+            socket.on('addUser', data => {
+                usersController.newUser(io, data)
+            })
 
-    socket.on('updateUser', data => {
-        usersController.updateUser(io, data)
-    })
+            socket.on('updateUser', data => {
+                usersController.updateUser(io, data)
+            })
 
-    socket.on('deleteUser', id => {
-        usersController.deleteUser(io, id)
-    })
+            socket.on('deleteUser', id => {
+                usersController.deleteUser(io, id)
+            })
 
-    socket.on('disconnect', () => {
-        console.log('client disconnected')
-    })
-});
+            socket.on('disconnect', () => {
+                console.log('client disconnected')
+            })
+})    
 
 
 
