@@ -5,6 +5,9 @@ const assetSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    roomId: {
+        type: String
+    },
     status: {
         type: Number,
         required: true

@@ -13,7 +13,7 @@ exports.getUsers = async (req, res) => {
         }else {
             let usersArray = []
             try{
-                usersArray = await User.find({})
+                usersArray = await User.find({roomId: user.roomId})
                 return res.status(201).send({
                     error: false,
                     usersArray
@@ -34,6 +34,7 @@ exports.newUser= async (io, userFromServer) => {
         const newUser = new User({
             username: ioUser.username,
             password: ioUser.password,
+            roomId: ioUser.roomId,
             role: ioUser.role,
             job: ioUser.job
         })
@@ -44,7 +45,7 @@ exports.newUser= async (io, userFromServer) => {
             console.log(result)
         }else{
             result = {success: true, data: user}
-            io.emit('UserAdded', result)
+            io.in(ioUser.roomId).emit('UserAdded', result)
         }   
         })
 
@@ -58,6 +59,7 @@ exports.updateUser = async (io, userFromServer) => {
         let user = await User.findById(id)
             user.username = newUser.username,
             user.password = newUser.password,
+            user.roomId = user.roomId,
             user.role = newUser.role,
             user.job = newUser.job
 
@@ -67,7 +69,7 @@ exports.updateUser = async (io, userFromServer) => {
                     console.log(result)                    
                 }else{
                     result = {success: true, data: updatedUser}
-                    io.emit('UserUpdated', result)
+                    io.in(user.roomId).emit('UserUpdated', result)
                 }
             })
 
@@ -83,7 +85,7 @@ exports.deleteUser = async (io, id) => {
                 console.log(result)            
             }else {
                 result = {success: true, data: deletedUser}
-                io.emit('UserDeleted', result)  
+                io.in(user.roomId).emit('UserDeleted', result)  
             }            
         })
 }

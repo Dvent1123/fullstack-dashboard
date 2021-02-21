@@ -7,7 +7,7 @@ import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
 const UsersContainer = ({user, users, setUsers}) => {
-    const {_id, username, job, password, role} = user
+    const {_id, username,roomId, job, password, role} = user
     const {isShown, toggle} = ModalContainer()
 
     const [userName, setUserName] = useState(username)
@@ -92,6 +92,7 @@ const UsersContainer = ({user, users, setUsers}) => {
         const newUser = {
             id: _id,
             username: userName,
+            roomId: roomId,
             password: newPassword,
             role: newRole,
             job: newJob

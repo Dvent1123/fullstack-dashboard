@@ -2,6 +2,7 @@ import React, {useEffect} from 'react'
 import { Link } from 'react-router-dom'
 import socketIoClient from 'socket.io-client'
 import useToken from '../../utils/useToken'
+import jwt_decode from 'jwt-decode'
 let socket;
 
 const Home = () => {
@@ -10,7 +11,14 @@ const Home = () => {
     const realToken = parseToken.token
     useEffect(() => {
         socket = socketIoClient('http://localhost:5000', {transports: ['websocket', 'polling'], auth: {token: realToken}})
+        //this is where we will join a room by emitting the room number we want to join 
+        let decoded = jwt_decode(realToken)
+        socket.emit('subscribe', decoded.roomId)
+        socket.on('joined', message => console.log(message))
     })
+
+    // useEffect(() => {
+    // })
 
     return (
         <div className="home-container">

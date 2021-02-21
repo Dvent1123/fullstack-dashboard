@@ -12,7 +12,7 @@ exports.getTasks = async (req, res) => {
       } else {
             let tasksArray = []
             try{
-                tasksArray = await Tasks.find({})
+                tasksArray = await Tasks.find({roomId: user.roomId})
                 return res.status(201).send({
                     error: false,
                     tasksArray
@@ -32,6 +32,7 @@ exports.newTask = async (io, taskFromServer) => {
 
     const newTask = new Tasks({
             createdBy: ioTask.createdBy,
+            roomId: ioTask.roomId,
             assignedTo: ioTask.assignedTo,
             asset: ioTask.asset,
             status: ioTask.status,
@@ -44,7 +45,7 @@ exports.newTask = async (io, taskFromServer) => {
                 console.log(result)            
             }else{
                 result = {success: true, data: task}
-                io.emit('TaskAdded', result)
+                io.in(ioTask.roomId).emit('TaskAdded', result)
             }
         })
         
@@ -58,6 +59,7 @@ exports.updateTask = async (io, taskFromServer) => {
     
         let task = await Tasks.findById(id)
             task.createdBy = newTask.createdBy,
+            task.roomId = task.roomId,
             task.assignedTo = newTask.assignedTo,
             task.asset = newTask.asset,
             task.status = newTask.status,
@@ -69,7 +71,7 @@ exports.updateTask = async (io, taskFromServer) => {
                 console.log(result)                    
                 }else{
                     result = {success: true, data: updatedTask}
-                    io.emit('TaskUpdated', result)
+                    io.in(task.roomId).emit('TaskUpdated', result)
                 }
             })
 
@@ -85,7 +87,7 @@ exports.deleteTask = async (io, id) => {
                 console.log(result)                       
             }else{
                 result = {success: true,data: deletedTask}
-                io.emit('TaskDeleted', result)
+                io.in(task.roomId).emit('TaskDeleted', result)
             }
         })
     }

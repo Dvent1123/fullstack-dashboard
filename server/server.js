@@ -13,9 +13,11 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const assetsRouter = require('./routes/assets')
 const tasksRouter = require('./routes/tasks')
+const homeRouter = require('./routes/home')
 const assetsController = require('./controllers/assetsController')
 const tasksController = require('./controllers/tasksController')
 const usersController = require('./controllers/usersController')
+const roomController = require('./controllers/roomController')
 const authRoutes = require('./routes/auth')
 const server= require('http').createServer(app)
 const io = require('socket.io')(server, {
@@ -28,6 +30,12 @@ const jwt = require('jsonwebtoken')
 app.use(cors())
 app.use(passport.initialize())
 require('./config/passport')
+// const WebSockets = require('./utils/WebSockets')
+
+//THIS IS ONLY A TEST
+// io.on('connection', WebSockets.connection)
+
+
 
 io.use(function(socket, next){
   if (socket.handshake.auth){
@@ -46,6 +54,11 @@ io.use(function(socket, next){
 //socket.io connection
 io.on('connection', socket => {
         console.log('new client connected')
+            //subscribes the socket to the room that they are a part of
+            socket.on('subscribe', room => {
+                socket.join(room)
+                roomController.joinRoom(io, room)
+            })
             socket.on('addAsset', data => {
                 assetsController.newAsset(io, data)
             })
@@ -108,6 +121,7 @@ app.use('/users', usersRouter)
 app.use('/assets', assetsRouter)
 app.use('/tasks', tasksRouter)
 app.use('/login', authRoutes)
+app.use('/home', homeRouter)
 
 server.listen(port, ()=> {
     console.log('server is running')

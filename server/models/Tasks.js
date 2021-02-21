@@ -5,6 +5,9 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    roomId: {
+        type: String
+    },
     assignedTo: {
         type: String,
         required: true

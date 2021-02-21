@@ -1,4 +1,4 @@
-import React, {useState, useEffect}  from 'react'
+import React, {useState, useEffect, useRef}  from 'react'
 import AssetsContainer from '../Helpers/AssetsContainer'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
@@ -11,6 +11,7 @@ import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
 import {socket} from '../Main/Home'
+import jwt_decode from 'jwt-decode'
 
 
     // case 'info':
@@ -41,7 +42,9 @@ const Assets = () => {
     const [description, setDescription] = useState('')
     const [toast, setToast] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [decoded, setDecoded] = useState('')
     const { token } = useToken()
+    let realToken = useRef()
 
     useEffect(() => {
         let timer = setTimeout(() => setLoading(false), 6000)
@@ -50,12 +53,20 @@ const Assets = () => {
         }
     }, [])
 
-   //gets the assets using the services
-  const getAssets = async () => {
+    useEffect(()=> {
         const parseToken = JSON.parse(token)
-        let res = await getAll(parseToken.token)
-        setAssets(res.assetsArray)
-  };
+        realToken.current = parseToken.token
+        setDecoded(jwt_decode(realToken.current))
+    },[token])
+
+   //gets the assets using the services
+//   const getAssets = async () => {
+//         console.log(decoded.roomId + ' this is in getAssets')
+//         getAll(realToken.current).then(res => {
+//             setAssets(res.assetsArray)
+//         })
+//         .catch(err => console.log(err))
+//   }
 
   //toggles the success messsage
 
@@ -92,19 +103,26 @@ const Assets = () => {
 
 
   useEffect(() => {
-      if(!assets){
-        getAssets();
-      }
-  });
+    const getAssets = () => {
+            console.log(' this is in getAssets')
+            getAll(realToken.current).then(res => {
+                setAssets(res.assetsArray)
+            })
+            .catch(err => console.log(err))
+    }
+    getAssets()
+  },[]);
 
 
 //Handles form submit for new asset
     const onSubmit = (e) => {
         e.preventDefault()
+        console.log(decoded.roomId + ' this is the submit')
 
         const newAsset = {
             name: name,
             status: status,
+            roomId: decoded.roomId,
             location: location,
             desc: description
         }

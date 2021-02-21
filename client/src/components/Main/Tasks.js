@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import TasksContainer from '../Helpers/TasksContainer'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
@@ -12,6 +12,7 @@ import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
 import {socket} from '../Main/Home'
+import jwt_decode from 'jwt-decode'
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -28,6 +29,8 @@ const Tasks = () => {
 
     const [loading, setLoading] = useState(true)
     const { token} = useToken()
+    const [decoded, setDecoded] = useState('')
+    let realToken = useRef()
 
 
     useEffect(() => {
@@ -37,19 +40,14 @@ const Tasks = () => {
         }
     }, [])
 
-    //gets the assets using the services
-    const getAssets = async () => {
+    useEffect(() => {
         const parseToken = JSON.parse(token)
-        console.log(parseToken.token)
-        let res = await getAll(parseToken.token)
-        setAssets(res.assetsArray)
-    };
+        realToken.current = parseToken.token
+        setDecoded(jwt_decode(realToken.current))
+    }, [token])
 
-    const getTasks = async () => {
-        const parseToken = JSON.parse(token)
-        let res = await getAllTasks(parseToken.token)
-        setTasks(res.tasksArray)
-    }
+    //gets the assets using the services
+
 
     const newTaskFunction = async () => {
         socket.on('TaskAdded', (result) => {
@@ -82,10 +80,10 @@ const Tasks = () => {
 
     const onSubmit = (e) => {
         e.preventDefault()
-
         const newTask = {
                 createdBy: createdBy,
                 assignedTo: assignedTo,
+                roomId: decoded.roomId,
                 asset: assignedAsset,
                 status: status,
                 desc: desc
@@ -100,17 +98,26 @@ const Tasks = () => {
     }
 
     useEffect(() => {
-        if(!tasks){
-        getTasks();
-      }
-    })
+        const getTasks = () => {
+            getAllTasks(realToken.current).then(res => {
+                setTasks(res.tasksArray)
+            })
+            .catch(err => console.log(err))
+        }
+        getTasks()
+    }, [])
 
     //useeffect to get the assets to fill out modal
     useEffect(() => {
-      if(!assets){
-        getAssets();
-      }
-    });
+        const getAssets = () => {
+            console.log('this is in the getassets')
+            getAll(realToken.current).then(res => {
+                setAssets(res.assetsArray)
+            })
+            .catch(err => console.log(err))
+        };
+        getAssets()
+    }, []);
 
    
 

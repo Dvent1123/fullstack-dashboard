@@ -8,7 +8,7 @@ import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
 const TasksContainer = ({task, assets, tasks, setTasks}) => {
-    const {assignedTo, desc,asset,status,createdBy, _id} = task
+    const {assignedTo,roomId, desc,asset,status,createdBy, _id} = task
     const {isShown, toggle} = ModalContainer()
 
     const [taskAssignedTo, setTaskAssignedTo] = useState(assignedTo)
@@ -92,6 +92,7 @@ const TasksContainer = ({task, assets, tasks, setTasks}) => {
         const newTask = {
             id: _id,
             createdBy: createdBy,
+            roomId: roomId,
             assignedTo: taskAssignedTo,
             asset: taskAsset,
             status: taskStatus,

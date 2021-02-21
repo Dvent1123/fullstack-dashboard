@@ -8,8 +8,9 @@ import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
+
 const AssetsContainer = ({asset, assets, setAssets}) => {
-    const {name, desc, location, status, _id} = asset
+    const {name, desc,roomId, location, status, _id} = asset
     const [assetName, setAssetName] = useState(name)
     const [assetDesc, setAssetDesc] = useState(desc)
     const [assetLocation, setAssetLocation] = useState(location)
@@ -24,6 +25,7 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
     
     const [toast, setToast] = useState(null)
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
+
 
 
     //sends the asset to remove
@@ -146,7 +148,7 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
         const newTask = {
                 createdBy: 'User ID will go here',
                 assignedTo: assignedTo,
-                //below is the asset name of the asset we are assigning a task to
+                roomId: roomId,
                 asset: assetName,
                 status: taskStatus,
                 desc: description

@@ -12,9 +12,10 @@ exports.getAssets = async (req, res) => {
             console.log(info.message)
             res.send(info.message)
         }else {
+            console.log(user)
             let assetsArray = []
             try{
-                assetsArray = await Assets.find({})
+                assetsArray = await Assets.find({roomId: user.roomId})
                 return res.status(201).send({
                     error: false,
                     assetsArray
@@ -34,6 +35,7 @@ exports.newAsset = async (io, assetFromServer) => {
 
     const newAsset = new Assets({
              name: ioAsset.name,
+             roomId: ioAsset.roomId,
              status: ioAsset.status,
              location: ioAsset.location,
              desc: ioAsset.desc
@@ -41,10 +43,10 @@ exports.newAsset = async (io, assetFromServer) => {
      newAsset.save((err, asset) => {
         if(err) {
             result = {success: false, error: err}
-            io.emit('AssetAdded', result)
+            io.in(ioAsset.roomId).emit('AssetAdded', result)
         }else{
             result = {success: true, data: asset}
-            io.emit('AssetAdded', result)
+            io.in(ioAsset.roomId).emit('AssetAdded', result)
         }   
     })
 }
@@ -57,6 +59,7 @@ exports.updateAsset = async (io, assetFromServer) => {
         let asset = await Assets.findById(id)
 
             asset.name = newAsset.name,
+            asset.roomId = asset.roomId,
             asset.status = newAsset.status,
             asset.location = newAsset.location,
             asset.desc = newAsset.desc
@@ -64,10 +67,10 @@ exports.updateAsset = async (io, assetFromServer) => {
             asset.save((err, updatedAsset) => {
             if(err) {
                 result = {success: false, error: err}
-                io.emit('AssetUpdated', result)
+                io.in(asset.roomId).emit('AssetUpdated', result)
             }else{
                 result = {success: true, data: updatedAsset}
-                io.emit('AssetUpdated', result)
+                io.in(asset.roomId).emit('AssetUpdated', result)
             }   
         })
     
@@ -80,10 +83,10 @@ exports.deleteAsset = async (io, id) => {
         asset.remove((err, deletedAsset) => {
             if(err) {
                 result = {success: false, error: err}
-                io.emit('AssetDeleted', result)       
+                io.in(asset.roomId).emit('AssetDeleted', result)       
             }else {
                 result = {success: true, data: deletedAsset}
-                io.emit('AssetDeleted', result)  
+                io.in(asset.roomId).emit('AssetDeleted', result)  
             }
             })
 

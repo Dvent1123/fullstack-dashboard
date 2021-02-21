@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken')
 
-exports.createJWT = ( username, userId, duration) => {
+exports.createJWT = ( username, userId,roomId, duration) => {
     const payload = {
         username,
         userId,
+        roomId,
         duration
     }
 

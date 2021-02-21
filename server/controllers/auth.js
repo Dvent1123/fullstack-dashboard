@@ -1,4 +1,5 @@
 const User = require('../models/Users')
+const Room = require('../models/Room')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { createJWT } = require('../utils/auth')
@@ -23,6 +24,8 @@ exports.signup = (req, res, next) => {
         return res.status(422).send({ errors: errors });
     }
 
+    const room = new Room()
+
     User.findOne({username: username})
         .then(user => {
             if(user){
@@ -30,8 +33,10 @@ exports.signup = (req, res, next) => {
             } else {
                 //if you're signingup then you must be an admin
                 //or else the admin will add you to a project
+
                 const user = new User({
                         username: username,
+                        roomId: room._id,
                         password: password,
                         role: 'admin',
                         job: 'admin'
@@ -43,6 +48,9 @@ exports.signup = (req, res, next) => {
                         user.password = hash
                         user.save()
                             .then(response => {
+                                //pushes the new user id into the room userIds array
+                                room.userIds.push(response._id)
+                                room.save()
                                 res.status(200).send({
                                     success: true,
                                     result: response
@@ -98,6 +106,7 @@ exports.signin = (req, res) => {
                         let access_token = createJWT(
                             user.username,
                             user._id,
+                            user.roomId,
                             3600
                         )
 

@@ -1,4 +1,4 @@
-import React, {useState, useEffect}  from 'react'
+import React, {useState, useEffect, useRef}  from 'react'
 import UsersContainer from '../Helpers/UsersContainer'
 import {AiFillPlusCircle} from 'react-icons/ai'
 import UsersModal from '../Helpers/Modal/UsersModal'
@@ -12,6 +12,7 @@ import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
 import {socket} from '../Main/Home'
+import jwt_decode from 'jwt-decode'
 
 
 const Users = () => {
@@ -27,6 +28,8 @@ const Users = () => {
 
     const [loading, setLoading] = useState(true)
     const { token } = useToken()
+    const [decoded, setDecoded] = useState('')
+    let realToken = useRef()
 
     useEffect(() => {
         let timer = setTimeout(() => setLoading(false), 6000)
@@ -36,11 +39,12 @@ const Users = () => {
     }, [])
 
 
-    const getUsers = async () =>{
+    useEffect(()=> {
         const parseToken = JSON.parse(token)
-        let res = await getAllUsers(parseToken.token)
-        setUsers(res.usersArray)
-    }
+        realToken.current = parseToken.token
+        setDecoded(jwt_decode(realToken.current))
+    }, [token])
+
 
     const newUserFunction = async (userObj) => {
         socket.on('UserAdded', (result) => {
@@ -74,6 +78,7 @@ const Users = () => {
         e.preventDefault()
         const newUser = {
             username: userName,
+            roomId: decoded.roomId,
             password: password,
             role: role,
             job: job
@@ -90,10 +95,14 @@ const Users = () => {
 
 
     useEffect(()=> {
-        if(!users){
-            getUsers();
+        const getUsers = () => {
+            getAllUsers(realToken.current).then(res => {
+                setUsers(res.usersArray)
+            })
+            .catch(err => console.log(err))
         }
-    })
+        getUsers()
+    }, [])
 
     //renders the users
     const renderUsers = (user) => {
