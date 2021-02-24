@@ -1,13 +1,12 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {IoCheckmarkCircleSharp} from 'react-icons/io5'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import TasksModal from './Modal/TasksModal'
-import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
-const TasksContainer = ({task, assets, tasks, setTasks}) => {
+const TasksContainer = ({task, assets, tasks, setTasks, socket}) => {
     const {assignedTo,roomId, desc,asset,status,createdBy, _id} = task
     const {isShown, toggle} = ModalContainer()
 
@@ -22,38 +21,11 @@ const TasksContainer = ({task, assets, tasks, setTasks}) => {
 
     const removeTask = async() => {
         socket.emit('deleteTask', _id)
-        taskRemovalReturn()
+
     }
 
-    const taskRemovalReturn = async () => {
-        socket.on('TaskDeleted', (result) => {
-            const {data, success} = result
-            if(!success){
-                const errorToast = {
-                title: 'Danger',
-                description: 'There was an error :(',
-                backgroundColor: '#d9534f',
-                icon: errorIcon
-                }
 
-                setToast(errorToast)
-                toggleToast()            
-            }else{
-                const arrayAfterDeletion = tasks.filter(item => item._id !== data._id)
-                setTasks(arrayAfterDeletion)
-                const successToast = {
-                    title: 'Success',
-                    description: 'Task deleted!',
-                    backgroundColor: '#5cb85c',
-                    icon: checkIcon
-                }
-                setToast(successToast)
-                toggleToast()
-            }
-        })
-    }
-
-    const updateTask = async () => {
+    useEffect(() => {
         socket.on('TaskUpdated', (result) => {
             const {data, success} = result
             if(!success){
@@ -65,8 +37,6 @@ const TasksContainer = ({task, assets, tasks, setTasks}) => {
                 }
 
                 setToast(errorToast)
-                toggleToast() 
-                toggle()
             }else{
                 const taskIndex = tasks.findIndex(item => item._id === data._id)
                 const updatedTasksArray = [...tasks]
@@ -79,11 +49,10 @@ const TasksContainer = ({task, assets, tasks, setTasks}) => {
                     icon: checkIcon
                 }
                 setToast(successToast)
-                toggleToast()
-                toggle()
             }
         })
-    }
+    })
+
 
     //where you update the tasks
     const onSubmit = (e) => {
@@ -100,8 +69,7 @@ const TasksContainer = ({task, assets, tasks, setTasks}) => {
         }
 
         socket.emit('updateTask' , newTask)
-
-        updateTask()
+        toggle()
     }
 
 

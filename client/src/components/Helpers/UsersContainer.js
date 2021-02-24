@@ -1,12 +1,11 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import UsersModal from './Modal/UsersModal'
 import ModalContainer from './Modal/ModalContainer'
-import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
-const UsersContainer = ({user, users, setUsers}) => {
+const UsersContainer = ({user, users, setUsers, socket}) => {
     const {_id, username,roomId, job, password, role} = user
     const {isShown, toggle} = ModalContainer()
 
@@ -21,39 +20,10 @@ const UsersContainer = ({user, users, setUsers}) => {
 
     const removeUser = async () => {
         socket.emit('deleteUser', _id)
-        userRemovalReturn()
     }
 
-    const userRemovalReturn = async () => {
-        socket.on('UserDeleted', (result) => {
-            const {data, success} = result
-            if(!success){
-                const errorToast = {
-                title: 'Danger',
-                description: 'There was an error :(',
-                backgroundColor: '#d9534f',
-                icon: errorIcon
-                }
 
-                setToast(errorToast)
-                toggleToast()            
-            }else{
-                const arrayAfterDeletion = users.filter(item => item._id !== data._id)
-                setUsers(arrayAfterDeletion)
-                const successToast = {
-                    title: 'Success',
-                    description: 'User deleted!',
-                    backgroundColor: '#5cb85c',
-                    icon: checkIcon
-                }
-                setToast(successToast)
-                toggle()
-                toggleToast()
-            }
-        })
-    }
-
-    const updateUser = async () => {
+    useEffect(() => {
         socket.on('UserUpdated', (result) => {
             const {data, success} = result
             if(!success){
@@ -65,8 +35,8 @@ const UsersContainer = ({user, users, setUsers}) => {
                 }
 
                 setToast(errorToast)
-                toggleToast()                
-                toggle()
+                // toggleToast()                
+                // toggle()
             }else{
                 const userIndex = users.findIndex(item => item._id === data._id)
                 const updatedUsersArray = [...users]
@@ -79,11 +49,12 @@ const UsersContainer = ({user, users, setUsers}) => {
                     icon: checkIcon
                 }
                 setToast(successToast)
-                toggle()
-                toggleToast()
+                // toggle()
+                // toggleToast()
             }
         })
-    }
+    })
+
 
     //where you update the tasks
     const onSubmit = (e) => {
@@ -99,7 +70,6 @@ const UsersContainer = ({user, users, setUsers}) => {
         }
 
         socket.emit('updateUser', newUser)
-        updateUser()
     }
 
     return (

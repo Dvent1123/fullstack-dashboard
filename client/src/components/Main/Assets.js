@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef}  from 'react'
+import React, {useState, useContext,useEffect, useRef}  from 'react'
 import AssetsContainer from '../Helpers/AssetsContainer'
 import Modal from '../Helpers/Modal/Modal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
@@ -10,8 +10,8 @@ import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
-import {socket} from '../Main/Home'
 import jwt_decode from 'jwt-decode'
+import {SocketContext} from '../../services/socketService'
 
 
     // case 'info':
@@ -45,6 +45,7 @@ const Assets = () => {
     const [decoded, setDecoded] = useState('')
     const { token } = useToken()
     let realToken = useRef()
+    const socket = useContext(SocketContext)
 
     useEffect(() => {
         let timer = setTimeout(() => setLoading(false), 6000)
@@ -57,23 +58,26 @@ const Assets = () => {
         const parseToken = JSON.parse(token)
         realToken.current = parseToken.token
         setDecoded(jwt_decode(realToken.current))
-    },[token])
+        socket.emit('subscribe', jwt_decode(realToken.current).roomId)
 
-   //gets the assets using the services
-//   const getAssets = async () => {
-//         console.log(decoded.roomId + ' this is in getAssets')
-//         getAll(realToken.current).then(res => {
-//             setAssets(res.assetsArray)
-//         })
-//         .catch(err => console.log(err))
-//   }
+        return(() => {
+            socket.emit('unsubscribe', jwt_decode(realToken.current).roomId)
+            socket.removeAllListeners()
+        })
+    },[socket, token])
 
-  //toggles the success messsage
 
-  //THIS IS IMPORTANT, HANDLE 'data' WHICH COULD BE SUCCESSFUL OR AN ERROR
-  //IF AN ERROR HANDLE THAT AND IF SUCCESSFUL HANDLE THAT
-  const newAssetFunction = async () => {
+
+//this is where we'll have our socket stuff
+useEffect(() => {
+        socket.on('joined', message =>{ 
+            console.log(message)
+        })
+
+        socket.on('left', message => console.log(message))
+
         socket.on('AssetAdded', (result) => {
+            console.log('this is in the get assets')
             const {data, success} = result 
             if(!success) {
                 const errorToast = {
@@ -84,31 +88,59 @@ const Assets = () => {
                 }
 
                 setToast(errorToast)
-                toggle()
-                toggleToast()
             }else{
-                setAssets([...assets, data])
+                setAssets(prevAssets => [...prevAssets, data])
                 const successToast = {
                     title: 'Success',
                     description: 'Asset added!',
                     backgroundColor: '#5cb85c',
                     icon: checkIcon
                 }
+                //need to get rid of these and add them somewhere else
                 setToast(successToast)
-                toggle()
-                toggleToast()
             }
         })
-  }
+
+        socket.on('AssetDeleted', (result) => {
+            const {data, success} = result 
+            if(!success) {
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+                
+                setToast(errorToast)
+            }else{
+                if(assets){
+                    setAssets(prevAssets => prevAssets.filter(item => item._id !== data._id))
+                }
+
+                const successToast = {
+                    title: 'Success',
+                    description: 'Asset deleted!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }                
+                setToast(successToast)
+            }}
+        )
+
+    return(() => {
+        socket.removeAllListeners()
+    })
+},[socket, assets])
 
 
   useEffect(() => {
     const getAssets = () => {
-            console.log(' this is in getAssets')
-            getAll(realToken.current).then(res => {
-                setAssets(res.assetsArray)
-            })
-            .catch(err => console.log(err))
+        getAll(realToken.current).then(res => {
+            //makes the object we are returned into an array
+            var newArrayAssetofObject = Object.values(res.assetsArray)
+            setAssets(newArrayAssetofObject)
+        })
+        .catch(err => console.log(err))
     }
     getAssets()
   },[]);
@@ -128,7 +160,8 @@ const Assets = () => {
         }
  
         socket.emit('addAsset', newAsset)
-        newAssetFunction()
+
+        toggle()
 
         setName('')
         setStatus(0)
@@ -136,13 +169,11 @@ const Assets = () => {
         setDescription('')
     }
 
-
-
-    //renders the assets
+    // renders the assets
     const renderAssets = (filteredAsset) => {
         return (
             <div key={filteredAsset._id}>
-                <AssetsContainer asset={filteredAsset} assets={assets} setAssets={setAssets}/>
+                <AssetsContainer asset={filteredAsset} assets={assets} setAssets={setAssets} socket={socket}/>
             </div>
         )
     }
@@ -165,7 +196,8 @@ const Assets = () => {
                         <h2>Immediate Action</h2>
                     </div>                              
                     {   loading === false ?           
-                        (  <div className="assets">
+                        ( 
+                            <div className="assets">
                                 {(assets && assets.length > 0) ? (
                                     assets.filter(asset => asset.status === 1).map(filteredAsset => {
                                         return renderAssets(filteredAsset)
@@ -208,8 +240,8 @@ const Assets = () => {
                             (
                                 <div className="assets">
                                     {(assets && assets.length > 0) ? (
-                                        assets.filter(asset => asset.status === 1).map(filteredAsset => {
-                                         return renderAssets(filteredAsset)
+                                        assets.map(filteredAsset => {
+                                            return renderAssets(filteredAsset)
                                         })
                                     ) : (
                                         //come back and change this to something else

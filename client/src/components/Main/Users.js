@@ -1,18 +1,17 @@
-import React, {useState, useEffect, useRef}  from 'react'
+import React, {useState, useEffect, useRef, useContext}  from 'react'
 import UsersContainer from '../Helpers/UsersContainer'
 import {AiFillPlusCircle} from 'react-icons/ai'
 import UsersModal from '../Helpers/Modal/UsersModal'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
 import { getAllUsers } from '../../services/usersServices'
-// import {socket} from '../NavBar'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
-import {socket} from '../Main/Home'
 import jwt_decode from 'jwt-decode'
+import {SocketContext} from '../../services/socketService'
 
 
 const Users = () => {
@@ -31,6 +30,8 @@ const Users = () => {
     const [decoded, setDecoded] = useState('')
     let realToken = useRef()
 
+    const socket = useContext(SocketContext)
+
     useEffect(() => {
         let timer = setTimeout(() => setLoading(false), 6000)
         return () => {
@@ -43,10 +44,22 @@ const Users = () => {
         const parseToken = JSON.parse(token)
         realToken.current = parseToken.token
         setDecoded(jwt_decode(realToken.current))
-    }, [token])
+        socket.emit('subscribe', jwt_decode(realToken.current).roomId)
 
+        return(() => {
+            socket.emit('unsubscribe', jwt_decode(realToken.current).roomId)
+            socket.removeAllListeners()
+        })        
+    }, [token, socket])
 
-    const newUserFunction = async (userObj) => {
+//sockets use effect
+    useEffect(() => {
+        socket.on('joined', message =>{ 
+            console.log(message)
+        })
+
+        socket.on('left', message => console.log(message))
+
         socket.on('UserAdded', (result) => {
             const {data, success} = result
             if(!success){
@@ -57,22 +70,49 @@ const Users = () => {
                 icon: errorIcon
                 }
 
-                setToast(errorToast)
-                toggle()
-                toggleToast()            
+                setToast(errorToast)        
             }else{
-                setUsers([...users, data])
+                setUsers(prevUsers => [...prevUsers, data])
                 const successToast = {
                     title: 'Success',
                     description: 'User added!',
                     backgroundColor: '#5cb85c',
                     icon: checkIcon
                 }
-                setToast(successToast)
-                toggle()
-                toggleToast()            }   
+                setToast(successToast)   
+            }   
         })
-    }
+
+        socket.on('UserDeleted', (result) => {
+            const {data, success} = result
+            if(!success){
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+            }else{
+                if(users){
+                    setUsers(prevUsers => prevUsers.filter(item => item._id !== data._id))
+                }
+
+                const successToast = {
+                    title: 'Success',
+                    description: 'User deleted!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
+            }
+        })
+
+        return(() => {
+        socket.removeAllListeners()
+        })        
+    },[socket, users])
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -85,7 +125,8 @@ const Users = () => {
         }
 
         socket.emit('addUser', newUser)
-        newUserFunction()
+
+        toggle()
 
         setUserName('')
         setPassword('')
@@ -97,7 +138,8 @@ const Users = () => {
     useEffect(()=> {
         const getUsers = () => {
             getAllUsers(realToken.current).then(res => {
-                setUsers(res.usersArray)
+                var newArrayUserofObject = Object.values(res.usersArray)
+                setUsers(newArrayUserofObject)
             })
             .catch(err => console.log(err))
         }
@@ -108,7 +150,7 @@ const Users = () => {
     const renderUsers = (user) => {
         return (
             <div key={user._id}>
-                <UsersContainer user={user} users={users} setUsers={setUsers}/>
+                <UsersContainer user={user} users={users} setUsers={setUsers} socket={socket}/>
                 </div>
         )
     }

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import TasksContainer from '../Helpers/TasksContainer'
 import ModalContainer from '../Helpers/Modal/ModalContainer'
@@ -11,8 +11,9 @@ import errorIcon from '../../assets/error.svg';
 import Loading from '../Helpers/Loading'
 import Nav from '../Main/Nav'
 import useToken from '../../utils/useToken'
-import {socket} from '../Main/Home'
 import jwt_decode from 'jwt-decode'
+import {SocketContext} from '../../services/socketService'
+
 
 const Tasks = () => {
     const [tasks, setTasks] = useState(null)
@@ -31,6 +32,7 @@ const Tasks = () => {
     const { token} = useToken()
     const [decoded, setDecoded] = useState('')
     let realToken = useRef()
+    const socket = useContext(SocketContext)
 
 
     useEffect(() => {
@@ -44,12 +46,22 @@ const Tasks = () => {
         const parseToken = JSON.parse(token)
         realToken.current = parseToken.token
         setDecoded(jwt_decode(realToken.current))
-    }, [token])
+        socket.emit('subscribe', jwt_decode(realToken.current).roomId)
 
-    //gets the assets using the services
+        return(() => {
+            socket.emit('unsubscribe', jwt_decode(realToken.current).roomId)
+            socket.removeAllListeners()
+        })        
+    }, [socket,token])
 
+//sockets use effect
+    useEffect(()=> {
+        socket.on('joined', message =>{ 
+            console.log(message)
+        })
 
-    const newTaskFunction = async () => {
+        socket.on('left', message => console.log(message))
+
         socket.on('TaskAdded', (result) => {
             const {data, success} = result
             if(!success){
@@ -61,10 +73,8 @@ const Tasks = () => {
                 }
 
                 setToast(errorToast)
-                toggle()
-                toggleToast()
             }else{
-                setTasks([...tasks, data])
+                setTasks(prevTasks => [...prevTasks, data])
                 const successToast = {
                     title: 'Success',
                     description: 'Task added!',
@@ -72,11 +82,39 @@ const Tasks = () => {
                     icon: checkIcon
                 }
                 setToast(successToast)
-                toggle()
-                toggleToast()
             }
         })
-    }
+
+        socket.on('TaskDeleted', (result) => {
+            const {data, success} = result
+            if(!success){
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+            }else{
+                if(tasks){
+                    setTasks(prevTasks => prevTasks.filter(item => item._id !== data._id))
+                }
+                const successToast = {
+                    title: 'Success',
+                    description: 'Task deleted!',
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
+            }
+        })
+
+        return(() => {
+            socket.removeAllListeners()
+        })
+    },[socket, tasks])
+
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -90,7 +128,7 @@ const Tasks = () => {
             }
 
             socket.emit('addTask', newTask)
-            newTaskFunction()
+            toggle()
 
             setCreatedBy('')
             setAssignedTo('None')
@@ -100,7 +138,8 @@ const Tasks = () => {
     useEffect(() => {
         const getTasks = () => {
             getAllTasks(realToken.current).then(res => {
-                setTasks(res.tasksArray)
+                var newArrayTaskofObject = Object.values(res.tasksArray)
+                setTasks(newArrayTaskofObject)
             })
             .catch(err => console.log(err))
         }
@@ -112,7 +151,8 @@ const Tasks = () => {
         const getAssets = () => {
             console.log('this is in the getassets')
             getAll(realToken.current).then(res => {
-                setAssets(res.assetsArray)
+                var newArrayAssetofObject = Object.values(res.assetsArray)
+                setAssets(newArrayAssetofObject)
             })
             .catch(err => console.log(err))
         };
@@ -125,7 +165,7 @@ const Tasks = () => {
     const renderTasks = (filteredTask) => {
         return (
             <div key={filteredTask._id}>
-                <TasksContainer task={filteredTask} assets={assets} tasks={tasks} setTasks={setTasks}/>
+                <TasksContainer task={filteredTask} assets={assets} tasks={tasks} setTasks={setTasks} socket={socket}/>
             </div>
         )
     }

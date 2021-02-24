@@ -59,6 +59,10 @@ io.on('connection', socket => {
                 socket.join(room)
                 roomController.joinRoom(io, room)
             })
+            socket.on('unsubscribe', room => {
+                socket.leave(room)
+                roomController.leaveRoom(io, room)
+            })
             socket.on('addAsset', data => {
                 assetsController.newAsset(io, data)
             })

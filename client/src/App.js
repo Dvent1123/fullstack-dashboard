@@ -12,6 +12,7 @@ import Login from './components/LandingPage/Login'
 import useToken from './utils/useToken'
 import PrivateRoute from './utils/PrivateRoute'
 import PublicRoute from './utils/PublicRoute'
+import {SocketContext, socket} from './services/socketService'
 
 const App = () => {
   const { token } = useToken()
@@ -20,13 +21,15 @@ const App = () => {
     <BrowserRouter>
       <NavBar />
       <Switch>
-        <PrivateRoute component={Home} token={token} path='/home' exact />
-        <PublicRoute restricted={false} token={token} component={Landing} path='/' exact/>
-        <PublicRoute restricted={false} token={token} component={Register} path='/register' exact />
-        <PublicRoute restricted={true} token={token} component={Login} path='/login' exact/>
-        <PrivateRoute component={Assets} token={token} path='/assets' exact />
-        <PrivateRoute component={Tasks} token={token} path='/tasks' exact />
-        <PrivateRoute component={Users} token={token} path='/users' exact />
+        <SocketContext.Provider value={socket}>
+          <PrivateRoute component={Home} token={token} path='/home' exact />
+          <PublicRoute restricted={false} token={token} component={Landing} path='/' exact/>
+          <PublicRoute restricted={false} token={token} component={Register} path='/register' exact />
+          <PublicRoute restricted={true} token={token} component={Login} path='/login' exact/>
+          <PrivateRoute component={Assets} token={token} path='/assets' exact />
+          <PrivateRoute component={Tasks} token={token} path='/tasks' exact />
+          <PrivateRoute component={Users} token={token} path='/users' exact />
+        </SocketContext.Provider>
       </Switch>
     </BrowserRouter>
   )

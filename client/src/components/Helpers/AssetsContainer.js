@@ -1,15 +1,14 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import ModalContainer from './Modal/ModalContainer'
 import AssetsModal from './Modal/AssetsModal'
 import Modal from './Modal/Modal'
 import { BsPersonPlusFill } from "react-icons/bs";
-import {socket} from '../Main/Home'
 import Toast from '../Toast/Toast'
 import checkIcon from '../../assets/check.svg'
 import errorIcon from '../../assets/error.svg';
 
 
-const AssetsContainer = ({asset, assets, setAssets}) => {
+const AssetsContainer = ({asset, assets, setAssets, socket}) => {
     const {name, desc,roomId, location, status, _id} = asset
     const [assetName, setAssetName] = useState(name)
     const [assetDesc, setAssetDesc] = useState(desc)
@@ -27,44 +26,7 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
     const {isShown: isShownToast,toggle: toggleToast} = ModalContainer()
 
 
-
-    //sends the asset to remove
-    const removeAsset = async() => {
-        socket.emit('deleteAsset', _id)
-        assetRemovalReturn()
-    }
-
-    //handling the return from remove asset
-    const assetRemovalReturn = async () => {
-        socket.on('AssetDeleted', (result) => {
-            const {data, success} = result 
-            if(!success) {
-                const errorToast = {
-                title: 'Danger',
-                description: 'There was an error :(',
-                backgroundColor: '#d9534f',
-                icon: errorIcon
-                }
-                
-                setToast(errorToast)
-                toggleToast()
-            }else{
-                const arrayAfterDeletion = assets.filter(item => item._id !== data._id)
-                setAssets(arrayAfterDeletion)
-
-                const successToast = {
-                    title: 'Success',
-                    description: 'Asset deleted!',
-                    backgroundColor: '#5cb85c',
-                    icon: checkIcon
-                }                
-                setToast(successToast)
-                toggleToast()
-            }}
-        )
-    }
-
-    const updateAsset = async () => {
+    useEffect(()=> {
         socket.on('AssetUpdated', (result) => {
             const {data, success} = result
             if(!success){
@@ -76,8 +38,6 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
                 }
                 
                 setToast(errorToast)
-                toggleAssets()
-                toggleToast()
             }else{
                 
                 const assetIndex = assets.findIndex(item => item._id === data._id)
@@ -92,11 +52,32 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
                     icon: checkIcon
                 }
                 setToast(successToast)
-                toggleAssets()
-                toggleToast()
             }
         })
-    }
+
+        socket.on('TaskAdded', (result) => {
+            const {data, success} = result
+            if(!success){
+                const errorToast = {
+                title: 'Danger',
+                description: 'There was an error :(',
+                backgroundColor: '#d9534f',
+                icon: errorIcon
+                }
+
+                setToast(errorToast)
+            }else{
+                const successToast = {
+                    title: 'Success',
+                    description: `Task was assigned to ${data.asset}!`,
+                    backgroundColor: '#5cb85c',
+                    icon: checkIcon
+                }
+                setToast(successToast)
+            }
+        })
+    })
+
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -111,36 +92,9 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
 
         //emits this new asset to the server
         socket.emit('updateAsset', newAsset)
-        updateAsset()
+        toggleAssets()
     }
 
-    const newTaskFunction = async () => {
-        socket.on('TaskAdded', (result) => {
-            const {data, success} = result
-            if(!success){
-                const errorToast = {
-                title: 'Danger',
-                description: 'There was an error :(',
-                backgroundColor: '#d9534f',
-                icon: errorIcon
-                }
-
-                setToast(errorToast)
-                toggle()
-                toggleToast()
-            }else{
-                const successToast = {
-                    title: 'Success',
-                    description: `Task was assigned to ${data.asset}!`,
-                    backgroundColor: '#5cb85c',
-                    icon: checkIcon
-                }
-                setToast(successToast)
-                toggle()
-                toggleToast()
-            }
-        })
-    }
 
     const onSubmitAssignTask = (e) => {
         e.preventDefault()
@@ -156,8 +110,13 @@ const AssetsContainer = ({asset, assets, setAssets}) => {
 
         //emits this new task to the server
         socket.emit('addTask', newTask)
-        newTaskFunction()
+        toggle()
     }
+
+    const removeAsset = () => {
+        socket.emit('deleteAsset', _id)
+    }
+
 
     return (
         <section className="second-home-container">

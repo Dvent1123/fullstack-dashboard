@@ -5,3 +5,7 @@ const passport = require('passport')
 exports.joinRoom = async (io,room) => {
     io.in(room).emit('joined', {message: `You've joined ${room}`})
 }
+
+exports.leaveRoom = async (io, room) => {
+    io.in(room).emit('left', {message: `You've left ${room}`})
+}
